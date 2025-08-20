@@ -13,9 +13,9 @@ export class LoginGuard implements CanActivate {
   private router = inject(Router);
 
   canActivate(): Observable<boolean> {
-    return this.http.get<{ data: boolean }>(`${this.url}/status`).pipe(
+    return this.http.get<{ data: { isSetupComplete: boolean } }>(`${this.url}/status`).pipe(
       map(res => {
-        if (!res.data) {
+        if (!res.data.isSetupComplete) {
           this.router.navigate(['/setup']);
           return false;
         }

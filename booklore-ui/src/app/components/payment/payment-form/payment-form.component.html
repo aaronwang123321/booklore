@@ -1,0 +1,188 @@
+<div class="payment-form-container">
+  <p-card header="Payment Information" [style]="{'width': '100%'}">
+    <!-- Payment Amount Display -->
+    <div class="payment-amount" *ngIf="paymentData.amount > 0">
+      <h3>Total: ${{ formattedAmount }} {{ paymentData.currency.toUpperCase() }}</h3>
+      <p *ngIf="paymentData.description" class="payment-description">
+        {{ paymentData.description }}
+      </p>
+    </div>
+
+    <!-- Error Message -->
+    <p-message 
+      *ngIf="errorMessage" 
+      severity="error" 
+      [text]="errorMessage"
+      class="error-message">
+    </p-message>
+
+    <!-- Payment Form -->
+    <form [formGroup]="paymentForm" (ngSubmit)="onSubmit()" class="payment-form">
+      <!-- Billing Details Section -->
+      <div class="billing-section" *ngIf="showBillingDetails">
+        <h4>Billing Details</h4>
+        
+        <div class="form-row">
+          <div class="form-field">
+            <label for="email">Email Address *</label>
+            <input 
+              pInputText 
+              id="email" 
+              formControlName="email" 
+              placeholder="Enter your email"
+              [class.ng-invalid]="paymentForm.get('email')?.invalid && paymentForm.get('email')?.touched"
+            />
+            <small 
+              class="error-text" 
+              *ngIf="paymentForm.get('email')?.invalid && paymentForm.get('email')?.touched">
+              Please enter a valid email address
+            </small>
+          </div>
+          
+          <div class="form-field">
+            <label for="name">Full Name *</label>
+            <input 
+              pInputText 
+              id="name" 
+              formControlName="name" 
+              placeholder="Enter your full name"
+              [class.ng-invalid]="paymentForm.get('name')?.invalid && paymentForm.get('name')?.touched"
+            />
+            <small 
+              class="error-text" 
+              *ngIf="paymentForm.get('name')?.invalid && paymentForm.get('name')?.touched">
+              Please enter your full name
+            </small>
+          </div>
+        </div>
+
+        <!-- Address Section -->
+        <div formGroupName="address" class="address-section">
+          <h5>Billing Address</h5>
+          
+          <div class="form-field">
+            <label for="line1">Address Line 1 *</label>
+            <input 
+              pInputText 
+              id="line1" 
+              formControlName="line1" 
+              placeholder="Street address"
+              [class.ng-invalid]="paymentForm.get('address.line1')?.invalid && paymentForm.get('address.line1')?.touched"
+            />
+            <small 
+              class="error-text" 
+              *ngIf="paymentForm.get('address.line1')?.invalid && paymentForm.get('address.line1')?.touched">
+              Please enter your street address
+            </small>
+          </div>
+          
+          <div class="form-field">
+            <label for="line2">Address Line 2</label>
+            <input 
+              pInputText 
+              id="line2" 
+              formControlName="line2" 
+              placeholder="Apartment, suite, etc. (optional)"
+            />
+          </div>
+          
+          <div class="form-row">
+            <div class="form-field">
+              <label for="city">City *</label>
+              <input 
+                pInputText 
+                id="city" 
+                formControlName="city" 
+                placeholder="City"
+                [class.ng-invalid]="paymentForm.get('address.city')?.invalid && paymentForm.get('address.city')?.touched"
+              />
+              <small 
+                class="error-text" 
+                *ngIf="paymentForm.get('address.city')?.invalid && paymentForm.get('address.city')?.touched">
+                Please enter your city
+              </small>
+            </div>
+            
+            <div class="form-field">
+              <label for="state">State *</label>
+              <input 
+                pInputText 
+                id="state" 
+                formControlName="state" 
+                placeholder="State"
+                [class.ng-invalid]="paymentForm.get('address.state')?.invalid && paymentForm.get('address.state')?.touched"
+              />
+              <small 
+                class="error-text" 
+                *ngIf="paymentForm.get('address.state')?.invalid && paymentForm.get('address.state')?.touched">
+                Please enter your state
+              </small>
+            </div>
+            
+            <div class="form-field">
+              <label for="postal_code">ZIP Code *</label>
+              <input 
+                pInputText 
+                id="postal_code" 
+                formControlName="postal_code" 
+                placeholder="ZIP Code"
+                [class.ng-invalid]="paymentForm.get('address.postal_code')?.invalid && paymentForm.get('address.postal_code')?.touched"
+              />
+              <small 
+                class="error-text" 
+                *ngIf="paymentForm.get('address.postal_code')?.invalid && paymentForm.get('address.postal_code')?.touched">
+                Please enter your ZIP code
+              </small>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card Element Section -->
+      <div class="card-section">
+        <h4>Payment Method</h4>
+        
+        <div class="card-element-container">
+          <label for="card-element">Credit or Debit Card *</label>
+          <div 
+            #cardElement 
+            id="card-element" 
+            class="card-element"
+            [class.card-element-loading]="!stripeLoaded">
+            <!-- Stripe Elements will mount here -->
+            <div *ngIf="!stripeLoaded" class="card-loading">
+              <p-progressSpinner [style]="{'width': '20px', 'height': '20px'}"></p-progressSpinner>
+              <span>Loading payment form...</span>
+            </div>
+          </div>
+          
+          <div class="card-element-info">
+            <small class="info-text">
+              <i class="pi pi-lock"></i>
+              Your payment information is secure and encrypted
+            </small>
+          </div>
+        </div>
+      </div>
+
+      <!-- Submit Button -->
+      <div class="submit-section">
+        <p-button 
+          type="submit"
+          [label]="isProcessing ? 'Processing...' : submitButtonText"
+          [disabled]="!canSubmit"
+          [loading]="isProcessing"
+          styleClass="w-full"
+          size="large">
+        </p-button>
+        
+        <div class="payment-security" *ngIf="!isProcessing">
+          <small class="security-text">
+            <i class="pi pi-shield"></i>
+            Powered by Stripe - PCI DSS compliant
+          </small>
+        </div>
+      </div>
+    </form>
+  </p-card>
+</div>

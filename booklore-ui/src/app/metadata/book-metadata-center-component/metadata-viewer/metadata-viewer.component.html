@@ -11,7 +11,7 @@
             loading="lazy"
           />
 
-          @if (book?.metadata!.seriesNumber != null) {
+          @if (book?.metadata!.seriesNumber !== null) {
             <div class="absolute top-2 left-2 bg-black/60 text-white px-2 py-0.5 rounded-lg text-xs font-semibold">
               #{{ book?.metadata!.seriesNumber }}
             </div>
@@ -42,7 +42,11 @@
               @if (book?.metadata?.seriesName) {
                 <p
                   class="text-blue-600 cursor-pointer hover:underline"
+                  tabindex="0"
+                  role="button"
                   (click)="goToSeries(book?.metadata?.seriesName!)"
+                  (keydown.enter)="goToSeries(book?.metadata?.seriesName!)"
+                  (keydown.space)="goToSeries(book?.metadata?.seriesName!)"
                 >
                   {{ book?.metadata?.seriesName }}
                   @if (book?.metadata?.seriesNumber) {
@@ -67,7 +71,7 @@
 
                 <p class="text-lg">
                   @for (author of book?.metadata!.authors; track author; let isLast = $last) {
-                    <a class="hover:underline dark:text-blue-400 cursor-pointer" (click)="goToAuthorBooks(author)">
+                    <a class="hover:underline dark:text-blue-400 cursor-pointer" tabindex="0" (click)="goToAuthorBooks(author)" (keydown.enter)="goToAuthorBooks(author)" (keydown.space)="goToAuthorBooks(author)">
                       {{ author }}
                     </a>
                     @if (!isLast) {
@@ -188,7 +192,7 @@
             <div class="overflow-x-auto scrollbar-hide max-w-7xl pt-2 md:pt-0">
               <div class="flex gap-2 w-max max-w-[1150px]">
                 @for (category of book.metadata!.categories; track category) {
-                  <a (click)="goToCategory(category)" class="shrink-0 no-underline cursor-pointer">
+                  <a tabindex="0" (click)="goToCategory(category)" (keydown.enter)="goToCategory(category)" (keydown.space)="goToCategory(category)" class="shrink-0 no-underline cursor-pointer">
                     <p-tag [value]="category"></p-tag>
                   </a>
                 }
@@ -201,7 +205,7 @@
               <p class="whitespace-nowrap max-w-[250px] overflow-hidden text-ellipsis">
                 <span class="font-bold">Publisher: </span>
                 @if (book?.metadata?.publisher) {
-                  <span class="underline hover:opacity-80 cursor-pointer" (click)="goToPublisher(book?.metadata?.publisher!)">
+                  <span class="underline hover:opacity-80 cursor-pointer" tabindex="0" (click)="goToPublisher(book?.metadata?.publisher!)" (keydown.enter)="goToPublisher(book?.metadata?.publisher!)" (keydown.space)="goToPublisher(book?.metadata?.publisher!)">
                     {{ book?.metadata?.publisher }}
                   </span>
                 } @else {
@@ -236,7 +240,10 @@
                 <span
                   class="inline-block px-2 py-0.5 rounded-full text-xs font-bold text-white cursor-pointer"
                   [ngClass]="getStatusSeverityClass(selectedReadStatus)"
-                  (click)="menu.toggle($event)">
+                  tabindex="0"
+                  (click)="menu.toggle($event)"
+                  (keydown.enter)="menu.toggle($event)"
+                  (keydown.space)="menu.toggle($event)">
                   {{ getStatusLabel(selectedReadStatus) }}
               </span>
                 <p-menu #menu [popup]="true" [model]="readStatusMenuItems"></p-menu>
@@ -270,7 +277,7 @@
               </p>
               <p class="whitespace-nowrap flex items-center gap-2">
                 <span class="font-bold">Metadata Match:</span>
-                @if (book?.metadataMatchScore != null) {
+                @if (book?.metadataMatchScore !== null) {
                   <span
                     class="inline-block px-2 py-0.5 rounded-lg text-xs font-bold text-gray-200 border"
                     [ngClass]="getMatchScoreColorClass(book?.metadataMatchScore!)">
@@ -287,7 +294,10 @@
               <i
                 class="pi cursor-pointer text-sm"
                 [ngClass]="showFilePath ? 'pi-eye-slash' : 'pi-eye'"
+                tabindex="0"
                 (click)="showFilePath = !showFilePath"
+                (keydown.enter)="showFilePath = !showFilePath"
+                (keydown.space)="showFilePath = !showFilePath"
               ></i>
               @if (showFilePath) {
                 <code class="text-xs font-mono truncate text-gray-300">{{ book?.filePath }}</code>
@@ -322,7 +332,7 @@
               outlined
               (onClick)="assignShelf(book.id)">
             </p-button>
-            @if (userData.permissions.canDownload || userData.permissions.admin) {
+            @if (userData.role === 'ADMIN') {
               <p-button
                 label="Download"
                 icon="pi pi-download"
@@ -331,7 +341,7 @@
                 (onClick)="download(book.id)">
               </p-button>
             }
-            @if (userData.permissions.canEmailBook || userData.permissions.admin) {
+            @if (userData.role === 'ADMIN') {
               @if (emailMenuItems$ | async; as emailItems) {
                 <p-splitbutton
                   label="Quick Send"
@@ -343,7 +353,7 @@
                 </p-splitbutton>
               }
             }
-            @if (userData.permissions.canEditMetadata || userData.permissions.admin) {
+            @if (userData.role === 'ADMIN') {
               @if (refreshMenuItems$ | async; as refreshItems) {
                 <p-splitbutton
                   [label]="isAutoFetching ? 'Fetching...' : 'Auto Fetch'"
@@ -358,7 +368,7 @@
                 </p-splitbutton>
               }
             }
-            @if (userData.permissions.canDeleteBook || userData.permissions.admin) {
+            @if (userData.role === 'ADMIN') {
               @if (otherItems$ | async; as otherItems) {
                 <p-button icon="pi pi-ellipsis-v" outlined severity="danger" (click)="entitymenu.toggle($event)"></p-button>
                 <p-menu #entitymenu [model]="otherItems" [popup]="true" appendTo="body"></p-menu>

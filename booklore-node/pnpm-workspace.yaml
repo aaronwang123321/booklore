@@ -1,0 +1,11 @@
+ignoredBuiltDependencies:
+  - '@nestjs/core'
+  - '@prisma/client'
+  - '@prisma/engines'
+  - '@swc/core'
+  - bcrypt
+  - es5-ext
+  - esbuild
+  - msgpackr-extract
+  - prisma
+  - sharp

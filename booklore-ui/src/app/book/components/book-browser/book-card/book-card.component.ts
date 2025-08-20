@@ -59,7 +59,7 @@ export class BookCardComponent implements OnInit, OnDestroy {
   protected urlHelper = inject(UrlHelperService);
   private confirmationService = inject(ConfirmationService);
 
-  private userPermissions: any;
+  private userRole: 'ADMIN' | 'USER' | null = null;
   private metadataCenterViewMode: 'route' | 'dialog' = 'route';
   private destroy$ = new Subject<void>();
 
@@ -70,7 +70,7 @@ export class BookCardComponent implements OnInit, OnDestroy {
         takeUntil(this.destroy$)
       )
       .subscribe(user => {
-        this.userPermissions = user.permissions;
+        this.userRole = user.role;
         this.metadataCenterViewMode = user?.userSettings.metadataCenterViewMode ?? 'route';
         this.initMenu();
       });
@@ -360,23 +360,23 @@ export class BookCardComponent implements OnInit, OnDestroy {
   }
 
   private isAdmin(): boolean {
-    return this.userPermissions?.admin ?? false;
+    return this.userRole === 'ADMIN';
   }
 
   private hasEditMetadataPermission(): boolean {
-    return this.isAdmin() || (this.userPermissions?.canEditMetadata ?? false);
+    return this.isAdmin();
   }
 
   private hasDownloadPermission(): boolean {
-    return this.isAdmin() || (this.userPermissions?.canDownload ?? false);
+    return this.isAdmin();
   }
 
   private hasEmailBookPermission(): boolean {
-    return this.isAdmin() || (this.userPermissions?.canEmailBook ?? false);
+    return this.isAdmin();
   }
 
   private hasDeleteBookPermission(): boolean {
-    return this.isAdmin() || (this.userPermissions?.canDeleteBook ?? false);
+    return this.isAdmin();
   }
 
   private lastMouseEvent: MouseEvent | null = null;

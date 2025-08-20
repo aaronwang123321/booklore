@@ -1,0 +1,106 @@
+{
+  "auth": {
+    "login": {
+      "success": "Login successful",
+      "failed": "Invalid credentials",
+      "required": "Email and password are required"
+    },
+    "register": {
+      "success": "Registration successful",
+      "failed": "Registration failed",
+      "email_exists": "Email already exists",
+      "invalid_email": "Invalid email format",
+      "password_weak": "Password must be at least 8 characters long"
+    },
+    "token": {
+      "invalid": "Invalid token",
+      "expired": "Token has expired",
+      "missing": "Authorization token is required"
+    },
+    "logout": {
+      "success": "Logout successful"
+    }
+  },
+  "books": {
+    "create": {
+      "success": "Book created successfully",
+      "failed": "Failed to create book",
+      "title_required": "Book title is required",
+      "author_required": "Book author is required"
+    },
+    "update": {
+      "success": "Book updated successfully",
+      "failed": "Failed to update book",
+      "not_found": "Book not found"
+    },
+    "delete": {
+      "success": "Book deleted successfully",
+      "failed": "Failed to delete book",
+      "not_found": "Book not found"
+    },
+    "get": {
+      "not_found": "Book not found",
+      "access_denied": "Access denied to this book"
+    },
+    "upload": {
+      "success": "Book file uploaded successfully",
+      "failed": "Failed to upload book file",
+      "invalid_format": "Invalid file format. Only PDF, EPUB, and MOBI files are allowed",
+      "file_too_large": "File size exceeds the maximum limit"
+    }
+  },
+  "user": {
+    "profile": {
+      "update_success": "Profile updated successfully",
+      "update_failed": "Failed to update profile",
+      "not_found": "User not found"
+    },
+    "subscription": {
+      "active": "Subscription is active",
+      "expired": "Subscription has expired",
+      "not_found": "No active subscription found",
+      "upgrade_success": "Subscription upgraded successfully",
+      "cancel_success": "Subscription cancelled successfully"
+    }
+  },
+  "upload": {
+    "success": "File uploaded successfully",
+    "failed": "File upload failed",
+    "invalid_type": "Invalid file type",
+    "size_exceeded": "File size exceeds limit",
+    "processing": "File is being processed",
+    "processing_complete": "File processing completed",
+    "processing_failed": "File processing failed"
+  },
+  "validation": {
+    "required": "This field is required",
+    "invalid_email": "Invalid email format",
+    "invalid_uuid": "Invalid ID format",
+    "min_length": "Minimum length is {min} characters",
+    "max_length": "Maximum length is {max} characters",
+    "invalid_format": "Invalid format"
+  },
+  "errors": {
+    "internal_server": "Internal server error",
+    "bad_request": "Bad request",
+    "unauthorized": "Unauthorized access",
+    "forbidden": "Access forbidden",
+    "not_found": "Resource not found",
+    "conflict": "Resource conflict",
+    "too_many_requests": "Too many requests. Please try again later",
+    "service_unavailable": "Service temporarily unavailable"
+  },
+  "success": {
+    "operation_completed": "Operation completed successfully",
+    "data_saved": "Data saved successfully",
+    "data_deleted": "Data deleted successfully",
+    "data_updated": "Data updated successfully"
+  },
+  "notifications": {
+    "email_sent": "Email sent successfully",
+    "email_failed": "Failed to send email",
+    "welcome": "Welcome to BookLore!",
+    "subscription_reminder": "Your subscription expires soon",
+    "book_processed": "Your book has been processed and is ready to read"
+  }
+}

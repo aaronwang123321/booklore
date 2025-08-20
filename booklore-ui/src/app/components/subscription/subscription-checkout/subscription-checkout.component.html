@@ -1,0 +1,156 @@
+<div class="checkout-container">
+  <!-- Loading State -->
+  <div *ngIf="isLoading" class="loading-container">
+    <p-progressSpinner></p-progressSpinner>
+    <p>Loading subscription details...</p>
+  </div>
+
+  <!-- Main Checkout Content -->
+  <div *ngIf="!isLoading" class="checkout-content">
+    <!-- Header -->
+    <div class="checkout-header">
+      <h1>Complete Your Subscription</h1>
+      <p class="subtitle">You're just one step away from accessing all premium features</p>
+    </div>
+
+    <!-- Error Message -->
+    <p-message 
+      *ngIf="errorMessage" 
+      severity="error" 
+      [text]="errorMessage"
+      class="error-message">
+    </p-message>
+
+    <!-- Success Message -->
+    <p-message 
+      *ngIf="successMessage" 
+      severity="success" 
+      [text]="successMessage"
+      class="success-message">
+    </p-message>
+
+    <div class="checkout-layout">
+      <!-- Left Column: Plan Summary -->
+      <div class="plan-summary">
+        <p-card header="Order Summary">
+          <div *ngIf="selectedPlan" class="plan-details">
+            <div class="plan-header">
+              <h3>{{ selectedPlan.name }}</h3>
+              <div class="plan-price">
+                <span class="amount">${{ formattedPrice }}</span>
+                <span class="interval">/ {{ formattedInterval }}</span>
+              </div>
+            </div>
+            
+            <p class="plan-description">{{ selectedPlan.description }}</p>
+            
+            <div class="plan-features">
+              <h4>What's included:</h4>
+              <ul>
+                <li *ngFor="let feature of selectedPlan.features">
+                  <i class="pi pi-check"></i>
+                  {{ feature }}
+                </li>
+              </ul>
+            </div>
+            
+            <p-divider></p-divider>
+            
+            <!-- Coupon Section -->
+            <div class="coupon-section">
+              <h4>Have a coupon code?</h4>
+              <div class="coupon-input">
+                <input 
+                  pInputText 
+                  placeholder="Enter coupon code"
+                  formControlName="couponCode"
+                  [formGroup]="checkoutForm"
+                />
+                <p-button 
+                  label="Apply" 
+                  (click)="applyCoupon()"
+                  [disabled]="!checkoutForm.get('couponCode')?.value"
+                  size="small">
+                </p-button>
+              </div>
+            </div>
+            
+            <p-divider></p-divider>
+            
+            <!-- Total -->
+            <div class="total-section">
+              <div class="total-row">
+                <span class="total-label">Total</span>
+                <span class="total-amount">${{ (paymentFormData.amount / 100).toFixed(2) }}</span>
+              </div>
+              <small class="billing-note">
+                You will be charged ${{ (paymentFormData.amount / 100).toFixed(2) }} {{ paymentFormData.currency.toUpperCase() }} {{ formattedInterval }}
+              </small>
+            </div>
+          </div>
+        </p-card>
+      </div>
+
+      <!-- Right Column: Payment Form -->
+      <div class="payment-section">
+        <form [formGroup]="checkoutForm" class="checkout-form">
+          <!-- Terms and Conditions -->
+          <div class="terms-section">
+            <div class="checkbox-field">
+              <input 
+                type="checkbox" 
+                id="agreeToTerms" 
+                formControlName="agreeToTerms"
+                class="terms-checkbox"
+              />
+              <label for="agreeToTerms" class="terms-label">
+                I agree to the 
+                <a href="/terms" target="_blank">Terms of Service</a> 
+                and 
+                <a href="/privacy" target="_blank">Privacy Policy</a>
+              </label>
+            </div>
+            <small 
+              class="error-text" 
+              *ngIf="checkoutForm.get('agreeToTerms')?.invalid && checkoutForm.get('agreeToTerms')?.touched">
+              You must agree to the terms and conditions
+            </small>
+          </div>
+
+          <!-- Payment Form Component -->
+          <app-payment-form
+            [paymentData]="paymentFormData"
+            [showBillingDetails]="true"
+            [submitButtonText]="'Subscribe Now'"
+            [disabled]="!canProceed || isProcessing"
+            (paymentSuccess)="onPaymentSuccess($event)"
+            (paymentError)="onPaymentError($event)"
+            (formValidityChange)="onFormValidityChange()">
+          </app-payment-form>
+        </form>
+      </div>
+    </div>
+
+    <!-- Back Button -->
+    <div class="navigation-section">
+      <p-button 
+        label="Back to Plans" 
+        icon="pi pi-arrow-left" 
+        (click)="goBack()"
+        [text]="true"
+        class="back-button">
+      </p-button>
+    </div>
+
+    <!-- Security Notice -->
+    <div class="security-notice">
+      <div class="security-content">
+        <i class="pi pi-shield"></i>
+        <div class="security-text">
+          <h4>Secure Payment</h4>
+          <p>Your payment information is encrypted and secure. We use industry-standard SSL encryption to protect your data.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,471 @@
+.payment-history-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.header {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.header h2 {
+  color: #333;
+  margin-bottom: 10px;
+  font-size: 2rem;
+  font-weight: 600;
+}
+
+.header p {
+  color: #666;
+  font-size: 1.1rem;
+}
+
+/* 筛选区域 */
+.filters-section {
+  background: white;
+  border: 1px solid #e9ecef;
+  border-radius: 8px;
+  padding: 20px;
+  margin-bottom: 20px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.filters-row {
+  display: flex;
+  gap: 20px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.filter-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.search-group {
+  flex: 1;
+  min-width: 200px;
+}
+
+.filter-label {
+  font-weight: 600;
+  color: #495057;
+  white-space: nowrap;
+}
+
+.filter-select, .search-input {
+  padding: 8px 12px;
+  border: 1px solid #ced4da;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  background: white;
+}
+
+.filter-select:focus, .search-input:focus {
+  outline: none;
+  border-color: #007bff;
+  box-shadow: 0 0 0 2px rgba(0,123,255,0.25);
+}
+
+.search-input {
+  width: 100%;
+  max-width: 300px;
+}
+
+/* 加载和错误状态 */
+.loading {
+  text-align: center;
+  padding: 40px;
+}
+
+.spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid #f3f3f3;
+  border-top: 4px solid #007bff;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin: 0 auto 20px;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.error-message {
+  margin-bottom: 20px;
+}
+
+.error-card {
+  background: #f8d7da;
+  border: 1px solid #f5c6cb;
+  border-radius: 8px;
+  padding: 20px;
+  text-align: center;
+}
+
+.error-card h4 {
+  color: #721c24;
+  margin: 0 0 10px 0;
+}
+
+.error-card p {
+  color: #721c24;
+  margin: 0 0 15px 0;
+}
+
+/* 标签页 */
+.content-tabs {
+  background: white;
+  border: 1px solid #e9ecef;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.tab-buttons {
+  display: flex;
+  background: #f8f9fa;
+  border-bottom: 1px solid #e9ecef;
+}
+
+.tab-button {
+  flex: 1;
+  padding: 15px 20px;
+  border: none;
+  background: transparent;
+  color: #6c757d;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border-bottom: 3px solid transparent;
+}
+
+.tab-button:hover {
+  background: #e9ecef;
+  color: #495057;
+}
+
+.tab-button.active {
+  color: #007bff;
+  background: white;
+  border-bottom-color: #007bff;
+}
+
+.tab-content {
+  display: none;
+  padding: 25px;
+}
+
+.tab-content.active {
+  display: block;
+}
+
+/* 区域标题 */
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding-bottom: 15px;
+  border-bottom: 1px solid #e9ecef;
+}
+
+.section-header h3 {
+  margin: 0;
+  color: #333;
+  font-size: 1.3rem;
+  font-weight: 600;
+}
+
+.summary {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.total-amount {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #28a745;
+}
+
+/* 支付记录和发票列表 */
+.payments-list, .invoices-list {
+  max-height: 600px;
+  overflow-y: auto;
+}
+
+.payment-item, .invoice-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 0;
+  border-bottom: 1px solid #f8f9fa;
+  transition: background-color 0.2s ease;
+}
+
+.payment-item:hover, .invoice-item:hover {
+  background-color: #f8f9fa;
+  margin: 0 -25px;
+  padding-left: 25px;
+  padding-right: 25px;
+}
+
+.payment-item:last-child, .invoice-item:last-child {
+  border-bottom: none;
+}
+
+.payment-info, .invoice-info {
+  flex: 1;
+}
+
+.payment-header, .invoice-header {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  margin-bottom: 8px;
+}
+
+.payment-id, .invoice-id {
+  font-family: monospace;
+  font-size: 0.9rem;
+  color: #6c757d;
+  background: #f8f9fa;
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+.payment-date, .invoice-date {
+  color: #495057;
+  font-size: 0.9rem;
+}
+
+.payment-details, .invoice-details {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.payment-description {
+  color: #333;
+  font-weight: 500;
+}
+
+.payment-amount, .invoice-amount {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.amount {
+  font-weight: 600;
+  color: #333;
+  font-size: 1.1rem;
+}
+
+.currency {
+  color: #6c757d;
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+/* 状态徽章 */
+.status-badge {
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.status-success {
+  background: #d4edda;
+  color: #155724;
+}
+
+.status-warning {
+  background: #fff3cd;
+  color: #856404;
+}
+
+.status-danger {
+  background: #f8d7da;
+  color: #721c24;
+}
+
+.status-secondary {
+  background: #e2e3e5;
+  color: #383d41;
+}
+
+.status-default {
+  background: #f8f9fa;
+  color: #6c757d;
+}
+
+/* 操作按钮 */
+.payment-actions, .invoice-actions {
+  margin-left: 15px;
+}
+
+.btn-primary, .btn-secondary, .btn-link {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-decoration: none;
+  display: inline-block;
+}
+
+.btn-primary {
+  background: #007bff;
+  color: white;
+}
+
+.btn-primary:hover:not(:disabled) {
+  background: #0056b3;
+}
+
+.btn-secondary {
+  background: #6c757d;
+  color: white;
+}
+
+.btn-secondary:hover:not(:disabled) {
+  background: #545b62;
+}
+
+.btn-link {
+  background: transparent;
+  color: #007bff;
+  border: 1px solid #007bff;
+  padding: 6px 12px;
+  font-size: 0.85rem;
+}
+
+.btn-link:hover:not(:disabled) {
+  background: #007bff;
+  color: white;
+}
+
+button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* 无数据状态 */
+.no-data {
+  text-align: center;
+  padding: 40px;
+  color: #6c757d;
+}
+
+.no-data p {
+  margin: 0;
+  font-size: 1.1rem;
+}
+
+/* 分页 */
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 15px;
+  margin-top: 20px;
+  padding: 20px;
+}
+
+.page-btn {
+  padding: 8px 16px;
+  border: 1px solid #007bff;
+  background: white;
+  color: #007bff;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.page-btn:hover:not(:disabled) {
+  background: #007bff;
+  color: white;
+}
+
+.page-btn:disabled {
+  border-color: #ced4da;
+  color: #6c757d;
+  cursor: not-allowed;
+}
+
+.page-info {
+  color: #6c757d;
+  font-weight: 500;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .payment-history-container {
+    padding: 15px;
+  }
+  
+  .filters-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .filter-group {
+    justify-content: space-between;
+  }
+  
+  .search-group {
+    min-width: auto;
+  }
+  
+  .search-input {
+    max-width: none;
+  }
+  
+  .tab-buttons {
+    flex-direction: column;
+  }
+  
+  .payment-item, .invoice-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 15px;
+  }
+  
+  .payment-details, .invoice-details {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+    width: 100%;
+  }
+  
+  .payment-actions, .invoice-actions {
+    margin-left: 0;
+    width: 100%;
+  }
+  
+  .payment-actions button, .invoice-actions button {
+    width: 100%;
+  }
+  
+  .section-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+  
+  .pagination {
+    flex-direction: column;
+    gap: 10px;
+  }
+}

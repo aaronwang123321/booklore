@@ -1,0 +1,381 @@
+.system-monitoring {
+  padding: 1.5rem;
+  max-width: 1400px;
+  margin: 0 auto;
+
+  .monitoring-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    
+    h1 {
+      margin: 0;
+      color: var(--text-color);
+      font-size: 2rem;
+      font-weight: 600;
+    }
+
+    .header-actions {
+      display: flex;
+      gap: 1rem;
+    }
+  }
+
+  // 系统指标样式
+  .system-metrics {
+    .metrics-overview {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+
+      .metric-card {
+        .metric-content {
+          display: flex;
+          align-items: center;
+          gap: 1rem;
+          margin-bottom: 1rem;
+
+          .metric-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: white;
+
+            &.cpu {
+              background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            }
+
+            &.memory {
+              background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            }
+
+            &.disk {
+              background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            }
+
+            &.network {
+              background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+            }
+          }
+
+          .metric-info {
+            flex: 1;
+
+            h3 {
+              margin: 0 0 0.25rem 0;
+              font-size: 1.5rem;
+              font-weight: 700;
+              color: var(--text-color);
+            }
+
+            p {
+              margin: 0 0 0.25rem 0;
+              color: var(--text-color-secondary);
+              font-size: 0.875rem;
+              font-weight: 500;
+            }
+
+            small {
+              color: var(--text-color-secondary);
+              font-size: 0.75rem;
+            }
+          }
+        }
+      }
+    }
+
+    .charts-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+      gap: 1.5rem;
+
+      .chart-card {
+        .chart-container {
+          height: 300px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+      }
+    }
+  }
+
+  // 数据库状态样式
+  .database-status {
+    .status-overview {
+      .db-status-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1.5rem;
+
+        h2 {
+          margin: 0;
+          color: var(--text-color);
+        }
+      }
+
+      .db-metrics {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1rem;
+
+        .db-metric {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          padding: 0.75rem;
+          background: var(--surface-ground);
+          border-radius: 8px;
+          border: 1px solid var(--surface-border);
+
+          .metric-label {
+            font-weight: 500;
+            color: var(--text-color-secondary);
+          }
+
+          .metric-value {
+            font-weight: 600;
+            color: var(--text-color);
+          }
+        }
+      }
+    }
+  }
+
+  // 服务状态样式
+  .services-status {
+    p-table {
+      ::ng-deep {
+        .p-datatable-tbody > tr > td {
+          vertical-align: middle;
+        }
+      }
+    }
+  }
+
+  // 系统日志样式
+  .system-logs {
+    .logs-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+
+      h2 {
+        margin: 0;
+        color: var(--text-color);
+      }
+
+      .logs-actions {
+        display: flex;
+        gap: 1rem;
+      }
+    }
+
+    .log-message {
+      max-width: 300px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .text-center {
+      text-align: center;
+      color: var(--text-color-secondary);
+      font-style: italic;
+      padding: 2rem;
+    }
+  }
+
+  // 选项卡样式
+  ::ng-deep {
+    .p-tabview {
+      .p-tabview-nav {
+        background: var(--surface-card);
+        border: 1px solid var(--surface-border);
+        border-radius: 8px 8px 0 0;
+
+        .p-tabview-nav-link {
+          border: none;
+          background: transparent;
+          color: var(--text-color-secondary);
+          transition: all 0.2s ease;
+
+          &:hover {
+            background: var(--surface-hover);
+            color: var(--text-color);
+          }
+
+          &.p-highlight {
+            background: var(--primary-color);
+            color: var(--primary-color-text);
+          }
+        }
+      }
+
+      .p-tabview-panels {
+        background: var(--surface-card);
+        border: 1px solid var(--surface-border);
+        border-top: none;
+        border-radius: 0 0 8px 8px;
+        padding: 1.5rem;
+      }
+    }
+  }
+
+  // 响应式设计
+  @media (max-width: 768px) {
+    padding: 1rem;
+
+    .monitoring-header {
+      flex-direction: column;
+      gap: 1rem;
+      align-items: flex-start;
+
+      h1 {
+        font-size: 1.5rem;
+      }
+
+      .header-actions {
+        width: 100%;
+        justify-content: flex-start;
+      }
+    }
+
+    .system-metrics {
+      .metrics-overview {
+        grid-template-columns: 1fr;
+      }
+
+      .charts-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .database-status {
+      .db-metrics {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .system-logs {
+      .logs-header {
+        flex-direction: column;
+        gap: 1rem;
+        align-items: flex-start;
+
+        .logs-actions {
+          width: 100%;
+          justify-content: flex-start;
+        }
+      }
+
+      .log-message {
+        max-width: 150px;
+      }
+    }
+
+    ::ng-deep {
+      .p-tabview .p-tabview-panels {
+        padding: 1rem;
+      }
+    }
+  }
+
+  @media (max-width: 480px) {
+    .system-metrics {
+      .metric-card .metric-content {
+        flex-direction: column;
+        text-align: center;
+      }
+    }
+
+    .database-status {
+      .db-status-header {
+        flex-direction: column;
+        gap: 1rem;
+        align-items: flex-start;
+      }
+    }
+
+    .header-actions,
+    .logs-actions {
+      flex-direction: column;
+
+      p-button {
+        width: 100%;
+      }
+    }
+  }
+}
+
+// 深色主题适配
+:host-context(.dark-theme) {
+  .system-monitoring {
+    .database-status .db-metric {
+      background: var(--surface-section);
+      border-color: var(--surface-border);
+    }
+  }
+}
+
+// 动画效果
+.metric-card {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  }
+}
+
+.db-metric {
+  transition: background-color 0.2s ease, transform 0.2s ease;
+
+  &:hover {
+    background: var(--surface-hover) !important;
+    transform: translateY(-1px);
+  }
+}
+
+// 实时监控指示器
+.monitoring-header .header-actions p-button[severity="success"] {
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7);
+  }
+  70% {
+    box-shadow: 0 0 0 10px rgba(34, 197, 94, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(34, 197, 94, 0);
+  }
+}
+
+// 加载状态
+.loading-skeleton {
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: loading 1.5s infinite;
+  border-radius: 4px;
+  height: 20px;
+}
+
+@keyframes loading {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}

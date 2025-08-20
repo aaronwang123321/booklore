@@ -1,0 +1,406 @@
+.analytics {
+  padding: 1.5rem;
+  background: var(--surface-ground);
+  min-height: 100vh;
+
+  .analytics-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+    gap: 1rem;
+
+    h1 {
+      margin: 0;
+      color: var(--text-color);
+      font-size: 2rem;
+      font-weight: 600;
+    }
+
+    .header-controls {
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+      flex-wrap: wrap;
+
+      .time-range-selector {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+
+        label {
+          font-weight: 500;
+          color: var(--text-color);
+          white-space: nowrap;
+        }
+
+        p-dropdown {
+          min-width: 150px;
+        }
+
+        p-calendar {
+          margin-left: 0.5rem;
+        }
+      }
+
+      .header-actions {
+        display: flex;
+        gap: 0.75rem;
+      }
+    }
+  }
+
+  // 分析概览卡片样式
+  .analytics-overview {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+
+    .stat-card {
+      border: 1px solid var(--surface-border);
+      border-radius: 12px;
+      transition: all 0.3s ease;
+      overflow: hidden;
+
+      &:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+      }
+
+      .stat-content {
+        display: flex;
+        align-items: center;
+        padding: 1.5rem;
+        gap: 1rem;
+
+        .stat-icon {
+          width: 60px;
+          height: 60px;
+          border-radius: 12px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 1.5rem;
+          color: white;
+
+          &.users {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+          }
+
+          &.books {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+          }
+
+          &.active {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+          }
+
+          &.new {
+            background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+          }
+
+          &.rating {
+            background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+          }
+
+          &.sessions {
+            background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+          }
+
+          &.completion {
+            background: linear-gradient(135deg, #96fbc4 0%, #f9f586 100%);
+          }
+
+          &.libraries {
+            background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+          }
+
+          &.api {
+            background: linear-gradient(135deg, #a8caba 0%, #5d4e75 100%);
+          }
+
+          &.error {
+            background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
+          }
+
+          &.uptime {
+            background: linear-gradient(135deg, #a1c4fd 0%, #c2e9fb 100%);
+          }
+        }
+
+        .stat-info {
+          flex: 1;
+
+          h3 {
+            margin: 0 0 0.25rem 0;
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: var(--text-color);
+          }
+
+          p {
+            margin: 0 0 0.25rem 0;
+            color: var(--text-color-secondary);
+            font-weight: 500;
+          }
+
+          small {
+            color: var(--text-color-secondary);
+            font-size: 0.875rem;
+
+            &.growth-rate {
+              display: flex;
+              align-items: center;
+              gap: 0.25rem;
+              font-weight: 500;
+
+              &.positive {
+                color: var(--green-500);
+              }
+
+              &:not(.positive) {
+                color: var(--red-500);
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
+  // 图表网格布局
+  .charts-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+
+    .chart-card {
+      border: 1px solid var(--surface-border);
+      border-radius: 12px;
+      overflow: hidden;
+
+      &.full-width {
+        grid-column: 1 / -1;
+      }
+
+      .chart-container {
+        padding: 1rem;
+        height: 300px;
+        position: relative;
+
+        canvas {
+          max-height: 100% !important;
+        }
+      }
+
+      h3 {
+        margin: 0;
+        padding: 1rem 1.5rem;
+        background: var(--surface-section);
+        color: var(--text-color);
+        font-size: 1.1rem;
+        font-weight: 600;
+        border-bottom: 1px solid var(--surface-border);
+      }
+    }
+  }
+
+  // 表格样式
+  p-table {
+    .p-datatable {
+      border-radius: 8px;
+      overflow: hidden;
+      border: 1px solid var(--surface-border);
+
+      .p-datatable-header {
+        background: var(--surface-section);
+        border-bottom: 1px solid var(--surface-border);
+      }
+
+      .p-datatable-thead > tr > th {
+        background: var(--surface-section);
+        color: var(--text-color);
+        font-weight: 600;
+        padding: 1rem;
+        border-bottom: 1px solid var(--surface-border);
+      }
+
+      .p-datatable-tbody > tr {
+        transition: background-color 0.2s;
+
+        &:hover {
+          background: var(--surface-hover);
+        }
+
+        > td {
+          padding: 1rem;
+          border-bottom: 1px solid var(--surface-border);
+        }
+      }
+    }
+  }
+
+  // 选项卡样式
+  p-tabview {
+    .p-tabview-nav {
+      background: var(--surface-card);
+      border-bottom: 1px solid var(--surface-border);
+      border-radius: 8px 8px 0 0;
+
+      .p-tabview-nav-link {
+        padding: 1rem 1.5rem;
+        color: var(--text-color-secondary);
+        font-weight: 500;
+        transition: all 0.2s;
+
+        &:hover {
+          color: var(--primary-color);
+        }
+
+        .p-tabview-left-icon {
+          margin-right: 0.5rem;
+        }
+      }
+
+      .p-highlight .p-tabview-nav-link {
+        color: var(--primary-color);
+        background: var(--primary-50);
+      }
+    }
+
+    .p-tabview-panels {
+      background: var(--surface-card);
+      border-radius: 0 0 8px 8px;
+      padding: 2rem;
+    }
+  }
+
+  // 标签样式
+  p-tag {
+    .p-tag {
+      font-weight: 500;
+      padding: 0.25rem 0.75rem;
+      border-radius: 6px;
+    }
+  }
+
+  // 响应式设计
+  @media (max-width: 768px) {
+    padding: 1rem;
+
+    .analytics-header {
+      flex-direction: column;
+      align-items: stretch;
+
+      .header-controls {
+        flex-direction: column;
+        align-items: stretch;
+
+        .time-range-selector {
+          flex-direction: column;
+          align-items: stretch;
+          gap: 0.5rem;
+
+          label {
+            font-size: 0.875rem;
+          }
+        }
+
+        .header-actions {
+          justify-content: stretch;
+
+          p-button {
+            flex: 1;
+          }
+        }
+      }
+    }
+
+    .analytics-overview {
+      grid-template-columns: 1fr;
+      gap: 1rem;
+    }
+
+    .charts-grid {
+      grid-template-columns: 1fr;
+      gap: 1rem;
+
+      .chart-container {
+        height: 250px;
+      }
+    }
+
+    p-tabview .p-tabview-panels {
+      padding: 1rem;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .analytics-header h1 {
+      font-size: 1.5rem;
+    }
+
+    .stat-card .stat-content {
+      padding: 1rem;
+
+      .stat-icon {
+        width: 50px;
+        height: 50px;
+        font-size: 1.25rem;
+      }
+
+      .stat-info h3 {
+        font-size: 1.5rem;
+      }
+    }
+
+    .chart-container {
+      height: 200px;
+    }
+  }
+
+  // 深色主题适配
+  @media (prefers-color-scheme: dark) {
+    .stat-card {
+      &:hover {
+        box-shadow: 0 8px 25px rgba(255, 255, 255, 0.1);
+      }
+    }
+  }
+
+  // 动画效果
+  .stat-card,
+  .chart-card {
+    animation: fadeInUp 0.6s ease-out;
+  }
+
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  // 加载状态
+  .loading-skeleton {
+    background: linear-gradient(90deg, var(--surface-200) 25%, var(--surface-300) 50%, var(--surface-200) 75%);
+    background-size: 200% 100%;
+    animation: loading 1.5s infinite;
+  }
+
+  @keyframes loading {
+    0% {
+      background-position: 200% 0;
+    }
+    100% {
+      background-position: -200% 0;
+    }
+  }
+}

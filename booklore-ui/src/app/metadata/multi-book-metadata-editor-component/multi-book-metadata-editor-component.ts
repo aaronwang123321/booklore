@@ -47,9 +47,9 @@ export class MultiBookMetadataEditorComponent implements OnInit, OnDestroy {
     this.bookIds = this.config.data?.bookIds ?? [];
 
     this.userSubscription = this.userService.userState$.subscribe(userData => {
-      const userPermissions = userData?.permissions;
-      this.canEditMetadata = userPermissions?.canEditMetadata ?? false;
-      this.admin = userPermissions?.admin ?? false;
+      const isAdmin = userData?.role === 'ADMIN';
+      this.canEditMetadata = isAdmin;
+      this.admin = isAdmin;
     });
 
     const filteredBooks$ = this.bookService.bookState$.pipe(

@@ -1,0 +1,461 @@
+<div class="analytics">
+  <!-- 页面标题和控制区域 -->
+  <div class="analytics-header">
+    <h1>数据分析</h1>
+    <div class="header-controls">
+      <div class="time-range-selector">
+        <label for="timeRangeDropdown">时间范围:</label>
+        <p-dropdown 
+          id="timeRangeDropdown"
+          [options]="timeRangeOptions" 
+          [(ngModel)]="selectedTimeRange"
+          (onChange)="onTimeRangeChange()"
+          optionLabel="label"
+          optionValue="value">
+        </p-dropdown>
+        
+        <p-calendar 
+          *ngIf="selectedTimeRange === 'custom'"
+          [(ngModel)]="customDateRange"
+          (onSelect)="onCustomDateRangeChange()"
+          selectionMode="range"
+          [readonlyInput]="true"
+          placeholder="选择日期范围">
+        </p-calendar>
+      </div>
+      
+      <div class="header-actions">
+        <p-button 
+          label="刷新数据" 
+          icon="pi pi-refresh" 
+          severity="secondary"
+          (click)="refreshData()">
+        </p-button>
+        <p-button 
+          label="导出报告" 
+          icon="pi pi-download" 
+          (click)="exportAnalyticsData()">
+        </p-button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 分析选项卡 -->
+  <p-tabView>
+    <!-- 用户分析选项卡 -->
+    <p-tabPanel header="用户分析" leftIcon="pi pi-users">
+      <div class="user-analytics" *ngIf="userAnalytics$ | async as userStats">
+        <!-- 用户概览卡片 -->
+        <div class="analytics-overview">
+          <p-card class="stat-card">
+            <div class="stat-content">
+              <div class="stat-icon users">
+                <i class="pi pi-users"></i>
+              </div>
+              <div class="stat-info">
+                <h3>{{ userStats.totalUsers }}</h3>
+                <p>总用户数</p>
+                <small class="growth-rate" [class.positive]="userStats.userGrowthRate > 0">
+                  <i class="pi" [class.pi-arrow-up]="userStats.userGrowthRate > 0" [class.pi-arrow-down]="userStats.userGrowthRate < 0"></i>
+                  {{ userStats.userGrowthRate }}%
+                </small>
+              </div>
+            </div>
+          </p-card>
+
+          <p-card class="stat-card">
+            <div class="stat-content">
+              <div class="stat-icon active">
+                <i class="pi pi-eye"></i>
+              </div>
+              <div class="stat-info">
+                <h3>{{ userStats.activeUsers }}</h3>
+                <p>活跃用户</p>
+                <small>本月活跃</small>
+              </div>
+            </div>
+          </p-card>
+
+          <p-card class="stat-card">
+            <div class="stat-content">
+              <div class="stat-icon new">
+                <i class="pi pi-user-plus"></i>
+              </div>
+              <div class="stat-info">
+                <h3>{{ userStats.newUsersThisMonth }}</h3>
+                <p>新增用户</p>
+                <small>本月新增</small>
+              </div>
+            </div>
+          </p-card>
+        </div>
+
+        <!-- 用户分析图表 -->
+        <div class="charts-grid">
+          <p-card class="chart-card">
+            <ng-template pTemplate="header">
+              <h3>用户活动时间分布</h3>
+            </ng-template>
+            <div class="chart-container">
+              <p-chart 
+                type="bar" 
+                [data]="userActivityChartData" 
+                [options]="userActivityChartOptions">
+              </p-chart>
+            </div>
+          </p-card>
+
+          <p-card class="chart-card">
+            <ng-template pTemplate="header">
+              <h3>用户角色分布</h3>
+            </ng-template>
+            <div class="chart-container">
+              <p-chart 
+                type="doughnut" 
+                [data]="getUserRoleChartData(userStats)" 
+                [options]="{ responsive: true, maintainAspectRatio: false }">
+              </p-chart>
+            </div>
+          </p-card>
+        </div>
+
+        <!-- 最活跃用户表格 -->
+        <p-card>
+          <ng-template pTemplate="header">
+            <h3>最活跃用户</h3>
+          </ng-template>
+          <p-table [value]="userStats.topActiveUsers" [paginator]="true" [rows]="10">
+            <ng-template pTemplate="header">
+              <tr>
+                <th>用户名</th>
+                <th>活动次数</th>
+                <th>活跃度</th>
+              </tr>
+            </ng-template>
+            <ng-template pTemplate="body" let-user>
+              <tr>
+                <td>{{ user.userName }}</td>
+                <td>{{ user.activityCount }}</td>
+                <td>
+                  <p-tag 
+                    [value]="user.activityCount > 100 ? '高' : user.activityCount > 50 ? '中' : '低'"
+                    [severity]="user.activityCount > 100 ? 'success' : user.activityCount > 50 ? 'warning' : 'info'">
+                  </p-tag>
+                </td>
+              </tr>
+            </ng-template>
+          </p-table>
+        </p-card>
+      </div>
+    </p-tabPanel>
+
+    <!-- 书籍分析选项卡 -->
+    <p-tabPanel header="书籍分析" leftIcon="pi pi-book">
+      <div class="book-analytics" *ngIf="bookAnalytics$ | async as bookStats">
+        <!-- 书籍概览卡片 -->
+        <div class="analytics-overview">
+          <p-card class="stat-card">
+            <div class="stat-content">
+              <div class="stat-icon books">
+                <i class="pi pi-book"></i>
+              </div>
+              <div class="stat-info">
+                <h3>{{ bookStats.totalBooks }}</h3>
+                <p>总书籍数</p>
+                <small>{{ bookStats.booksAddedThisMonth }} 本月新增</small>
+              </div>
+            </div>
+          </p-card>
+
+          <p-card class="stat-card">
+            <div class="stat-content">
+              <div class="stat-icon rating">
+                <i class="pi pi-star"></i>
+              </div>
+              <div class="stat-info">
+                <h3>{{ bookStats.averageRating.toFixed(1) }}</h3>
+                <p>平均评分</p>
+                <small>{{ bookStats.totalRatings }} 个评分</small>
+              </div>
+            </div>
+          </p-card>
+        </div>
+
+        <!-- 书籍分析图表 -->
+        <div class="charts-grid">
+          <p-card class="chart-card">
+            <ng-template pTemplate="header">
+              <h3>书籍类型分布</h3>
+            </ng-template>
+            <div class="chart-container">
+              <p-chart 
+                type="pie" 
+                [data]="getBookGenreChartData(bookStats)" 
+                [options]="{ responsive: true, maintainAspectRatio: false }">
+              </p-chart>
+            </div>
+          </p-card>
+
+          <p-card class="chart-card">
+            <ng-template pTemplate="header">
+              <h3>书籍语言分布</h3>
+            </ng-template>
+            <div class="chart-container">
+              <p-chart 
+                type="bar" 
+                [data]="getBookLanguageChartData(bookStats)" 
+                [options]="{ responsive: true, maintainAspectRatio: false }">
+              </p-chart>
+            </div>
+          </p-card>
+        </div>
+
+        <!-- 最受欢迎书籍表格 -->
+        <p-card>
+          <ng-template pTemplate="header">
+            <h3>最受欢迎书籍</h3>
+          </ng-template>
+          <p-table [value]="bookStats.mostPopularBooks" [paginator]="true" [rows]="10">
+            <ng-template pTemplate="header">
+              <tr>
+                <th>书名</th>
+                <th>阅读次数</th>
+                <th>受欢迎程度</th>
+              </tr>
+            </ng-template>
+            <ng-template pTemplate="body" let-book>
+              <tr>
+                <td>{{ book.title }}</td>
+                <td>{{ book.readCount }}</td>
+                <td>
+                  <p-tag 
+                    [value]="book.readCount > 50 ? '热门' : book.readCount > 20 ? '受欢迎' : '一般'"
+                    [severity]="book.readCount > 50 ? 'danger' : book.readCount > 20 ? 'warning' : 'info'">
+                  </p-tag>
+                </td>
+              </tr>
+            </ng-template>
+          </p-table>
+        </p-card>
+      </div>
+    </p-tabPanel>
+
+    <!-- 阅读分析选项卡 -->
+    <p-tabPanel header="阅读分析" leftIcon="pi pi-chart-line">
+      <div class="reading-analytics" *ngIf="readingAnalytics$ | async as readingStats">
+        <!-- 阅读概览卡片 -->
+        <div class="analytics-overview">
+          <p-card class="stat-card">
+            <div class="stat-content">
+              <div class="stat-icon sessions">
+                <i class="pi pi-clock"></i>
+              </div>
+              <div class="stat-info">
+                <h3>{{ readingStats.totalReadingSessions }}</h3>
+                <p>总阅读会话</p>
+                <small>{{ formatDuration(readingStats.averageReadingTime) }} 平均时长</small>
+              </div>
+            </div>
+          </p-card>
+
+          <p-card class="stat-card">
+            <div class="stat-content">
+              <div class="stat-icon completion">
+                <i class="pi pi-check-circle"></i>
+              </div>
+              <div class="stat-info">
+                <h3>{{ readingStats.completionRate.toFixed(1) }}%</h3>
+                <p>完成率</p>
+                <small>书籍阅读完成率</small>
+              </div>
+            </div>
+          </p-card>
+        </div>
+
+        <!-- 阅读趋势图表 -->
+        <div class="charts-grid">
+          <p-card class="chart-card full-width">
+            <ng-template pTemplate="header">
+              <h3>阅读趋势分析</h3>
+            </ng-template>
+            <div class="chart-container">
+              <p-chart 
+                type="line" 
+                [data]="readingTrendsChartData" 
+                [options]="readingTrendsChartOptions">
+              </p-chart>
+            </div>
+          </p-card>
+
+          <p-card class="chart-card">
+            <ng-template pTemplate="header">
+              <h3>阅读时间分布</h3>
+            </ng-template>
+            <div class="chart-container">
+              <p-chart 
+                type="bar" 
+                [data]="getReadingTimeChartData(readingStats)" 
+                [options]="{ responsive: true, maintainAspectRatio: false }">
+              </p-chart>
+            </div>
+          </p-card>
+        </div>
+      </div>
+    </p-tabPanel>
+
+    <!-- 图书馆分析选项卡 -->
+    <p-tabPanel header="图书馆分析" leftIcon="pi pi-home">
+      <div class="library-analytics" *ngIf="libraryAnalytics$ | async as libraryStats">
+        <!-- 图书馆概览卡片 -->
+        <div class="analytics-overview">
+          <p-card class="stat-card">
+            <div class="stat-content">
+              <div class="stat-icon libraries">
+                <i class="pi pi-home"></i>
+              </div>
+              <div class="stat-info">
+                <h3>{{ libraryStats.totalLibraries }}</h3>
+                <p>总图书馆数</p>
+                <small>{{ libraryStats.averageBooksPerLibrary.toFixed(0) }} 平均书籍数</small>
+              </div>
+            </div>
+          </p-card>
+        </div>
+
+        <!-- 图书馆使用统计表格 -->
+        <p-card>
+          <ng-template pTemplate="header">
+            <h3>图书馆使用统计</h3>
+          </ng-template>
+          <p-table [value]="libraryStats.libraryUsageStats" [paginator]="true" [rows]="10">
+            <ng-template pTemplate="header">
+              <tr>
+                <th>图书馆名称</th>
+                <th>书籍数量</th>
+                <th>用户数量</th>
+                <th>使用率</th>
+              </tr>
+            </ng-template>
+            <ng-template pTemplate="body" let-library>
+              <tr>
+                <td>{{ library.name }}</td>
+                <td>{{ library.bookCount }}</td>
+                <td>{{ library.userCount }}</td>
+                <td>
+                  <p-tag 
+                    [value]="library.userCount > 10 ? '高' : library.userCount > 5 ? '中' : '低'"
+                    [severity]="library.userCount > 10 ? 'success' : library.userCount > 5 ? 'warning' : 'info'">
+                  </p-tag>
+                </td>
+              </tr>
+            </ng-template>
+          </p-table>
+        </p-card>
+
+        <!-- 存储使用情况表格 -->
+        <p-card>
+          <ng-template pTemplate="header">
+            <h3>存储使用情况</h3>
+          </ng-template>
+          <p-table [value]="libraryStats.storageUsage" [paginator]="true" [rows]="10">
+            <ng-template pTemplate="header">
+              <tr>
+                <th>图书馆名称</th>
+                <th>存储大小</th>
+                <th>存储状态</th>
+              </tr>
+            </ng-template>
+            <ng-template pTemplate="body" let-storage>
+              <tr>
+                <td>{{ storage.name }}</td>
+                <td>{{ formatBytes(storage.sizeBytes) }}</td>
+                <td>
+                  <p-tag 
+                    [value]="storage.sizeBytes > 1073741824 ? '大' : storage.sizeBytes > 104857600 ? '中' : '小'"
+                    [severity]="storage.sizeBytes > 1073741824 ? 'danger' : storage.sizeBytes > 104857600 ? 'warning' : 'success'">
+                  </p-tag>
+                </td>
+              </tr>
+            </ng-template>
+          </p-table>
+        </p-card>
+      </div>
+    </p-tabPanel>
+
+    <!-- 系统分析选项卡 -->
+    <p-tabPanel header="系统分析" leftIcon="pi pi-cog">
+      <div class="system-analytics" *ngIf="systemAnalytics$ | async as systemStats">
+        <!-- 系统概览卡片 -->
+        <div class="analytics-overview">
+          <p-card class="stat-card">
+            <div class="stat-content">
+              <div class="stat-icon api">
+                <i class="pi pi-server"></i>
+              </div>
+              <div class="stat-info">
+                <h3>{{ systemStats.apiCallsToday }}</h3>
+                <p>今日API调用</p>
+                <small>{{ systemStats.averageResponseTime }}ms 平均响应</small>
+              </div>
+            </div>
+          </p-card>
+
+          <p-card class="stat-card">
+            <div class="stat-content">
+              <div class="stat-icon error">
+                <i class="pi pi-exclamation-triangle"></i>
+              </div>
+              <div class="stat-info">
+                <h3>{{ systemStats.errorRate.toFixed(2) }}%</h3>
+                <p>错误率</p>
+                <small>系统错误率</small>
+              </div>
+            </div>
+          </p-card>
+
+          <p-card class="stat-card">
+            <div class="stat-content">
+              <div class="stat-icon uptime">
+                <i class="pi pi-check"></i>
+              </div>
+              <div class="stat-info">
+                <h3>{{ formatUptime(systemStats.systemUptime) }}</h3>
+                <p>系统运行时间</p>
+                <small>{{ systemStats.databaseQueries }} 数据库查询</small>
+              </div>
+            </div>
+          </p-card>
+        </div>
+
+        <!-- 系统性能图表 -->
+        <div class="charts-grid">
+          <p-card class="chart-card full-width">
+            <ng-template pTemplate="header">
+              <h3>系统性能监控</h3>
+            </ng-template>
+            <div class="chart-container">
+              <p-chart 
+                type="line" 
+                [data]="systemPerformanceChartData" 
+                [options]="systemPerformanceChartOptions">
+              </p-chart>
+            </div>
+          </p-card>
+
+          <p-card class="chart-card">
+            <ng-template pTemplate="header">
+              <h3>峰值使用时间</h3>
+            </ng-template>
+            <div class="chart-container">
+              <p-chart 
+                type="bar" 
+                [data]="getPeakUsageChartData(systemStats)" 
+                [options]="{ responsive: true, maintainAspectRatio: false }">
+              </p-chart>
+            </div>
+          </p-card>
+        </div>
+      </div>
+    </p-tabPanel>
+  </p-tabView>
+</div>

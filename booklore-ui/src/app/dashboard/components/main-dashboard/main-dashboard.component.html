@@ -7,9 +7,9 @@
       <div>
         @if (isLibrariesEmpty$ | async) {
           <div class="dashboard-no-library">
-            @if ((userService.userState$ | async)?.permissions; as permissions) {
+            @if ((userService.userState$ | async); as userData) {
               <div>
-                @if (permissions.admin || permissions.canManipulateLibrary) {
+                @if (userData.role === 'ADMIN') {
                   <div>
                     <h1 class="no-library-header">Looks like you haven't added a library yet. Let's add one!</h1>
                     <p-button

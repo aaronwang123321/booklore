@@ -1,0 +1,203 @@
+<div class="payment-history-container">
+  <div class="header">
+    <h2>支付历史</h2>
+    <p>查看您的支付记录和发票信息</p>
+  </div>
+
+  <!-- 筛选和搜索 -->
+  <div class="filters-section">
+    <div class="filters-row">
+      <div class="filter-group">
+        <span class="filter-label">时间范围:</span>
+        <select [(ngModel)]="selectedPeriod" (change)="onFilterChange()" class="filter-select">
+          <option value="all">全部</option>
+          <option value="last_month">最近一个月</option>
+          <option value="last_3_months">最近三个月</option>
+          <option value="last_6_months">最近六个月</option>
+          <option value="last_year">最近一年</option>
+        </select>
+      </div>
+      
+      <div class="filter-group">
+        <span class="filter-label">状态:</span>
+        <select [(ngModel)]="selectedStatus" (change)="onFilterChange()" class="filter-select">
+          <option value="all">全部状态</option>
+          <option value="paid">已支付</option>
+          <option value="open">待支付</option>
+          <option value="void">已作废</option>
+          <option value="draft">草稿</option>
+        </select>
+      </div>
+      
+      <div class="filter-group search-group">
+        <span class="filter-label">搜索:</span>
+        <input 
+          type="text" 
+          [(ngModel)]="searchTerm" 
+          (input)="onFilterChange()" 
+          placeholder="搜索ID或描述" 
+          class="search-input"
+        >
+      </div>
+      
+      <div class="filter-group">
+        <button class="btn-secondary" (click)="exportData()">导出数据</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 加载状态 -->
+  <div class="loading" *ngIf="loading">
+    <div class="spinner"></div>
+    <p>加载中...</p>
+  </div>
+
+  <!-- 错误信息 -->
+  <div class="error-message" *ngIf="error && !loading">
+    <div class="error-card">
+      <h4>出现错误</h4>
+      <p>{{ error }}</p>
+      <button class="btn-secondary" (click)="loadPaymentData()">重试</button>
+    </div>
+  </div>
+
+  <!-- 支付历史和发票 -->
+  <div class="content-tabs" *ngIf="!loading && !error">
+    <div class="tab-buttons">
+      <button class="tab-button active" onclick="showTab('payments')">支付记录</button>
+      <button class="tab-button" onclick="showTab('invoices')">发票</button>
+    </div>
+
+    <!-- 支付记录标签页 -->
+    <div id="payments-tab" class="tab-content active">
+      <div class="payments-section">
+        <div class="section-header">
+          <h3>支付记录</h3>
+          <div class="summary" *ngIf="paymentHistory">
+            <span class="total-amount">总计: {{ formatCurrency(paymentHistory.total) }}</span>
+          </div>
+        </div>
+        
+        <div class="payments-list" *ngIf="paginatedPayments.length > 0; else noPayments">
+          <div class="payment-item" *ngFor="let payment of paginatedPayments">
+            <div class="payment-info">
+              <div class="payment-header">
+                <span class="payment-id">{{ payment.id }}</span>
+                <span class="payment-date">{{ payment.date | date:'yyyy-MM-dd HH:mm' }}</span>
+              </div>
+              <div class="payment-details">
+                <span class="payment-description">{{ payment.description }}</span>
+                <div class="payment-amount">
+                  <span class="amount">{{ formatCurrency(payment.amount) }}</span>
+                  <span class="currency">{{ payment.currency.toUpperCase() }}</span>
+                </div>
+              </div>
+            </div>
+            <div class="payment-actions">
+              <button 
+                class="btn-link"
+                *ngIf="payment.pdfUrl || payment.hostedUrl"
+                (click)="downloadPaymentReceipt(payment)"
+              >
+                下载收据
+              </button>
+            </div>
+          </div>
+        </div>
+        
+        <ng-template #noPayments>
+          <div class="no-data">
+            <p>暂无支付记录</p>
+          </div>
+        </ng-template>
+      </div>
+    </div>
+
+    <!-- 发票标签页 -->
+    <div id="invoices-tab" class="tab-content">
+      <div class="invoices-section">
+        <div class="section-header">
+          <h3>发票</h3>
+        </div>
+        
+        <div class="invoices-list" *ngIf="paginatedInvoices.length > 0; else noInvoices">
+          <div class="invoice-item" *ngFor="let invoice of paginatedInvoices">
+            <div class="invoice-info">
+              <div class="invoice-header">
+                <span class="invoice-id">{{ invoice.id }}</span>
+                <span class="invoice-date">{{ invoice.created | date:'yyyy-MM-dd' }}</span>
+                <span class="status-badge" [class]="getStatusClass(invoice.status)">{{ getStatusText(invoice.status) }}</span>
+              </div>
+              <div class="invoice-details">
+                <div class="invoice-amount">
+                  <span class="amount">{{ formatCurrency(invoice.amount) }}</span>
+                  <span class="currency">{{ invoice.currency.toUpperCase() }}</span>
+                </div>
+              </div>
+            </div>
+            <div class="invoice-actions">
+              <button 
+                class="btn-link"
+                *ngIf="invoice.hostedUrl || invoice.pdfUrl"
+                (click)="downloadInvoice(invoice)"
+              >
+                查看发票
+              </button>
+            </div>
+          </div>
+        </div>
+        
+        <ng-template #noInvoices>
+          <div class="no-data">
+            <p>暂无发票记录</p>
+          </div>
+        </ng-template>
+      </div>
+    </div>
+  </div>
+
+  <!-- 分页 -->
+  <div class="pagination" *ngIf="totalPages > 1">
+    <button 
+      class="page-btn"
+      [disabled]="currentPage === 1"
+      (click)="goToPage(currentPage - 1)"
+    >
+      上一页
+    </button>
+    
+    <span class="page-info">
+      第 {{ currentPage }} 页，共 {{ totalPages }} 页
+    </span>
+    
+    <button 
+      class="page-btn"
+      [disabled]="currentPage === totalPages"
+      (click)="goToPage(currentPage + 1)"
+    >
+      下一页
+    </button>
+  </div>
+</div>
+
+<script>
+function showTab(tabName) {
+  // 隐藏所有标签页内容
+  const tabContents = document.querySelectorAll('.tab-content');
+  tabContents.forEach(content => content.classList.remove('active'));
+  
+  // 移除所有按钮的活跃状态
+  const tabButtons = document.querySelectorAll('.tab-button');
+  tabButtons.forEach(button => button.classList.remove('active'));
+  
+  // 显示选中的标签页
+  const selectedTab = document.getElementById(tabName + '-tab');
+  if (selectedTab) {
+    selectedTab.classList.add('active');
+  }
+  
+  // 激活对应的按钮
+  const selectedButton = event.target;
+  selectedButton.classList.add('active');
+}
+</script>

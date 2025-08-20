@@ -1,0 +1,154 @@
+<div class="subscription-status-container">
+  <div class="header">
+    <h2>订阅状态</h2>
+    <p>管理您的订阅和查看账单信息</p>
+  </div>
+
+  <!-- 加载状态 -->
+  <div class="loading" *ngIf="loading">
+    <div class="spinner"></div>
+    <p>加载中...</p>
+  </div>
+
+  <!-- 错误信息 -->
+  <div class="error-message" *ngIf="error && !loading">
+    <div class="error-card">
+      <h4>出现错误</h4>
+      <p>{{ error }}</p>
+      <button class="btn-secondary" (click)="loadSubscriptionData()">重试</button>
+    </div>
+  </div>
+
+  <!-- 订阅信息 -->
+  <div class="subscription-info" *ngIf="subscription && !loading">
+    <div class="info-card">
+      <div class="card-header">
+        <h3>当前订阅</h3>
+        <span class="status-badge" [class]="getStatusClass(subscription.status)">{{ getStatusText(subscription.status) }}</span>
+      </div>
+      
+      <div class="subscription-details">
+        <div class="detail-item" *ngIf="subscription.planName">
+          <span class="detail-label">订阅计划:</span>
+          <span>{{ subscription.planName }}</span>
+        </div>
+        
+        <div class="detail-item" *ngIf="subscription.nextBillingDate">
+          <span class="detail-label">下次计费日期:</span>
+          <span>{{ subscription.nextBillingDate | date:'yyyy-MM-dd' }}</span>
+        </div>
+        
+        <div class="detail-item" *ngIf="subscription.isInTrial">
+          <span class="detail-label">试用状态:</span>
+          <span class="trial-badge">试用中</span>
+        </div>
+      </div>
+
+      <!-- 使用限制 -->
+      <div class="usage-limits">
+        <h4>使用情况</h4>
+        <div class="limits-grid">
+          <div class="limit-item">
+            <span class="detail-label">图书数量:</span>
+            <div class="usage-bar">
+              <div class="usage-progress" [style.width.%]="(subscription.limits.usedBooks / subscription.limits.maxBooks) * 100"></div>
+            </div>
+            <span class="usage-text">{{ subscription.limits.usedBooks }} / {{ subscription.limits.maxBooks }}</span>
+          </div>
+          
+          <div class="limit-item">
+            <span class="detail-label">图书馆数量:</span>
+            <div class="usage-bar">
+              <div class="usage-progress" [style.width.%]="(subscription.limits.usedLibraries / subscription.limits.maxLibraries) * 100"></div>
+            </div>
+            <span class="usage-text">{{ subscription.limits.usedLibraries }} / {{ subscription.limits.maxLibraries }}</span>
+          </div>
+          
+          <div class="limit-item">
+            <span class="detail-label">用户数量:</span>
+            <div class="usage-bar">
+              <div class="usage-progress" [style.width.%]="(subscription.limits.usedUsers / subscription.limits.maxUsers) * 100"></div>
+            </div>
+            <span class="usage-text">{{ subscription.limits.usedUsers }} / {{ subscription.limits.maxUsers }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 操作按钮 -->
+      <div class="action-buttons">
+        <button 
+          class="btn-primary"
+          (click)="changePlan()"
+          [disabled]="processing"
+        >
+          更改计划
+        </button>
+        
+        <button 
+          class="btn-secondary"
+          (click)="openCustomerPortal()"
+          [disabled]="processing"
+        >
+          管理支付方式
+        </button>
+        
+        <button 
+          class="btn-warning"
+          *ngIf="subscription.status === 'active'"
+          (click)="cancelSubscription()"
+          [disabled]="processing"
+        >
+          取消订阅
+        </button>
+        
+        <button 
+          class="btn-success"
+          *ngIf="subscription.status === 'canceled'"
+          (click)="reactivateSubscription()"
+          [disabled]="processing"
+        >
+          重新激活
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 发票历史 -->
+  <div class="invoices-section" *ngIf="!loading">
+    <div class="invoices-card">
+      <div class="card-header">
+        <h3>发票历史</h3>
+      </div>
+      
+      <div class="invoices-list" *ngIf="invoices.length > 0; else noInvoices">
+        <div class="invoice-item" *ngFor="let invoice of invoices">
+          <div class="invoice-info">
+            <div class="invoice-details">
+              <span class="invoice-id">{{ invoice.id }}</span>
+              <span class="invoice-date">{{ invoice.created | date:'yyyy-MM-dd' }}</span>
+            </div>
+            <div class="invoice-amount">
+              <span class="amount">{{ formatCurrency(invoice.amount) }}</span>
+              <span class="status-badge" [class]="'status-' + invoice.status">{{ getInvoiceStatusText(invoice.status) }}</span>
+            </div>
+          </div>
+          <div class="invoice-actions">
+            <button 
+              class="btn-link"
+              *ngIf="invoice.hostedUrl || invoice.pdfUrl"
+              (click)="downloadInvoice(invoice)"
+            >
+              查看发票
+            </button>
+          </div>
+        </div>
+      </div>
+      
+      <ng-template #noInvoices>
+        <div class="no-invoices">
+          <p>暂无发票记录</p>
+        </div>
+      </ng-template>
+    </div>
+  </div>
+</div>

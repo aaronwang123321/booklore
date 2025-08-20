@@ -1,0 +1,434 @@
+.subscription-status-container {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.header {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.header h2 {
+  color: #333;
+  margin-bottom: 10px;
+  font-size: 2rem;
+  font-weight: 600;
+}
+
+.header p {
+  color: #666;
+  font-size: 1.1rem;
+}
+
+/* 加载状态 */
+.loading {
+  text-align: center;
+  padding: 40px;
+}
+
+.spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid #f3f3f3;
+  border-top: 4px solid #007bff;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin: 0 auto 20px;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* 错误信息 */
+.error-message {
+  margin-bottom: 20px;
+}
+
+.error-card {
+  background: #f8d7da;
+  border: 1px solid #f5c6cb;
+  border-radius: 8px;
+  padding: 20px;
+  text-align: center;
+}
+
+.error-card h4 {
+  color: #721c24;
+  margin: 0 0 10px 0;
+}
+
+.error-card p {
+  color: #721c24;
+  margin: 0 0 15px 0;
+}
+
+/* 卡片样式 */
+.info-card, .invoices-card {
+  background: white;
+  border: 1px solid #e9ecef;
+  border-radius: 12px;
+  padding: 25px;
+  margin-bottom: 20px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding-bottom: 15px;
+  border-bottom: 1px solid #e9ecef;
+}
+
+.card-header h3 {
+  margin: 0;
+  color: #333;
+  font-size: 1.3rem;
+  font-weight: 600;
+}
+
+/* 状态徽章 */
+.status-badge {
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.status-active {
+  background: #d4edda;
+  color: #155724;
+}
+
+.status-canceled {
+  background: #f8d7da;
+  color: #721c24;
+}
+
+.status-warning {
+  background: #fff3cd;
+  color: #856404;
+}
+
+.status-error {
+  background: #f8d7da;
+  color: #721c24;
+}
+
+.status-paused {
+  background: #e2e3e5;
+  color: #383d41;
+}
+
+.status-default {
+  background: #f8f9fa;
+  color: #6c757d;
+}
+
+.status-paid {
+  background: #d4edda;
+  color: #155724;
+}
+
+.status-open {
+  background: #fff3cd;
+  color: #856404;
+}
+
+.status-void {
+  background: #e2e3e5;
+  color: #383d41;
+}
+
+.status-uncollectible {
+  background: #f8d7da;
+  color: #721c24;
+}
+
+.status-draft {
+  background: #f8f9fa;
+  color: #6c757d;
+}
+
+/* 订阅详情 */
+.subscription-details {
+  margin-bottom: 25px;
+}
+
+.detail-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 0;
+  border-bottom: 1px solid #f8f9fa;
+}
+
+.detail-item:last-child {
+  border-bottom: none;
+}
+
+.detail-label {
+  font-weight: 600;
+  color: #495057;
+  min-width: 120px;
+}
+
+.trial-badge {
+  background: #17a2b8;
+  color: white;
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+/* 使用限制 */
+.usage-limits {
+  margin-bottom: 25px;
+}
+
+.usage-limits h4 {
+  margin: 0 0 15px 0;
+  color: #333;
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.limits-grid {
+  display: grid;
+  gap: 15px;
+}
+
+.limit-item {
+  display: grid;
+  grid-template-columns: 120px 1fr auto;
+  align-items: center;
+  gap: 15px;
+}
+
+.usage-bar {
+  background: #e9ecef;
+  border-radius: 10px;
+  height: 8px;
+  overflow: hidden;
+  position: relative;
+}
+
+.usage-progress {
+  background: linear-gradient(90deg, #28a745, #20c997);
+  height: 100%;
+  border-radius: 10px;
+  transition: width 0.3s ease;
+}
+
+.usage-progress[style*="100%"] {
+  background: linear-gradient(90deg, #dc3545, #fd7e14);
+}
+
+.usage-progress[style*="80%"], .usage-progress[style*="90%"] {
+  background: linear-gradient(90deg, #ffc107, #fd7e14);
+}
+
+.usage-text {
+  font-size: 0.9rem;
+  color: #6c757d;
+  font-weight: 500;
+  min-width: 80px;
+  text-align: right;
+}
+
+/* 操作按钮 */
+.action-buttons {
+  display: flex;
+  gap: 15px;
+  flex-wrap: wrap;
+}
+
+.btn-primary, .btn-secondary, .btn-warning, .btn-success, .btn-link {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-decoration: none;
+  display: inline-block;
+  text-align: center;
+}
+
+.btn-primary {
+  background: #007bff;
+  color: white;
+}
+
+.btn-primary:hover:not(:disabled) {
+  background: #0056b3;
+  transform: translateY(-1px);
+}
+
+.btn-secondary {
+  background: #6c757d;
+  color: white;
+}
+
+.btn-secondary:hover:not(:disabled) {
+  background: #545b62;
+}
+
+.btn-warning {
+  background: #ffc107;
+  color: #212529;
+}
+
+.btn-warning:hover:not(:disabled) {
+  background: #e0a800;
+}
+
+.btn-success {
+  background: #28a745;
+  color: white;
+}
+
+.btn-success:hover:not(:disabled) {
+  background: #1e7e34;
+}
+
+.btn-link {
+  background: transparent;
+  color: #007bff;
+  border: 1px solid #007bff;
+  padding: 6px 12px;
+  font-size: 0.85rem;
+}
+
+.btn-link:hover:not(:disabled) {
+  background: #007bff;
+  color: white;
+}
+
+button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none !important;
+}
+
+/* 发票列表 */
+.invoices-section {
+  margin-top: 30px;
+}
+
+.invoices-list {
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.invoice-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 0;
+  border-bottom: 1px solid #f8f9fa;
+}
+
+.invoice-item:last-child {
+  border-bottom: none;
+}
+
+.invoice-info {
+  flex: 1;
+}
+
+.invoice-details {
+  display: flex;
+  gap: 15px;
+  margin-bottom: 5px;
+}
+
+.invoice-id {
+  font-family: monospace;
+  font-size: 0.9rem;
+  color: #6c757d;
+}
+
+.invoice-date {
+  color: #495057;
+  font-size: 0.9rem;
+}
+
+.invoice-amount {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.amount {
+  font-weight: 600;
+  color: #333;
+  font-size: 1.1rem;
+}
+
+.invoice-actions {
+  margin-left: 15px;
+}
+
+.no-invoices {
+  text-align: center;
+  padding: 40px;
+  color: #6c757d;
+}
+
+.no-invoices p {
+  margin: 0;
+  font-size: 1.1rem;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .subscription-status-container {
+    padding: 15px;
+  }
+  
+  .action-buttons {
+    flex-direction: column;
+  }
+  
+  .action-buttons button {
+    width: 100%;
+  }
+  
+  .limit-item {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+  
+  .usage-text {
+    text-align: left;
+  }
+  
+  .invoice-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+  
+  .invoice-amount {
+    justify-content: space-between;
+    width: 100%;
+  }
+  
+  .invoice-actions {
+    margin-left: 0;
+    width: 100%;
+  }
+  
+  .invoice-actions button {
+    width: 100%;
+  }
+}

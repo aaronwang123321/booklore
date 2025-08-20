@@ -1,0 +1,404 @@
+/* Checkout Container */
+.checkout-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+  min-height: 100vh;
+}
+
+/* Loading State */
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
+  gap: 1rem;
+}
+
+.loading-container p {
+  color: var(--text-color-secondary);
+  font-size: 1rem;
+}
+
+/* Header */
+.checkout-header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.checkout-header h1 {
+  margin: 0 0 0.5rem 0;
+  color: var(--text-color);
+  font-size: 2rem;
+  font-weight: 600;
+}
+
+.subtitle {
+  margin: 0;
+  color: var(--text-color-secondary);
+  font-size: 1.1rem;
+}
+
+/* Messages */
+.error-message,
+.success-message {
+  margin-bottom: 1.5rem;
+}
+
+/* Layout */
+.checkout-layout {
+  display: grid;
+  grid-template-columns: 1fr 1.5fr;
+  gap: 2rem;
+  margin-bottom: 2rem;
+}
+
+/* Plan Summary */
+.plan-summary {
+  height: fit-content;
+}
+
+.plan-details {
+  padding: 0;
+}
+
+.plan-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 1rem;
+}
+
+.plan-header h3 {
+  margin: 0;
+  color: var(--text-color);
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+.plan-price {
+  text-align: right;
+}
+
+.plan-price .amount {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--primary-color);
+}
+
+.plan-price .interval {
+  font-size: 0.9rem;
+  color: var(--text-color-secondary);
+  margin-left: 0.25rem;
+}
+
+.plan-description {
+  color: var(--text-color-secondary);
+  margin-bottom: 1.5rem;
+  line-height: 1.5;
+}
+
+/* Plan Features */
+.plan-features h4 {
+  margin: 0 0 0.75rem 0;
+  color: var(--text-color);
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.plan-features ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.plan-features li {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+  color: var(--text-color);
+}
+
+.plan-features li i {
+  color: var(--green-500);
+  font-size: 0.875rem;
+}
+
+/* Coupon Section */
+.coupon-section h4 {
+  margin: 0 0 0.75rem 0;
+  color: var(--text-color);
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.coupon-input {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.coupon-input input {
+  flex: 1;
+  padding: 0.5rem;
+  border: 1px solid var(--surface-300);
+  border-radius: 6px;
+  font-size: 0.9rem;
+}
+
+.coupon-input input:focus {
+  outline: none;
+  border-color: var(--primary-color);
+}
+
+/* Total Section */
+.total-section {
+  background: var(--surface-50);
+  padding: 1rem;
+  border-radius: 8px;
+  border: 1px solid var(--surface-200);
+}
+
+.total-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.total-label {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--text-color);
+}
+
+.total-amount {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--primary-color);
+}
+
+.billing-note {
+  color: var(--text-color-secondary);
+  font-size: 0.85rem;
+  line-height: 1.4;
+}
+
+/* Payment Section */
+.payment-section {
+  background: white;
+  border-radius: 8px;
+  border: 1px solid var(--surface-200);
+  padding: 1.5rem;
+}
+
+.checkout-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+/* Terms Section */
+.terms-section {
+  padding: 1rem;
+  background: var(--surface-50);
+  border-radius: 6px;
+  border: 1px solid var(--surface-200);
+}
+
+.checkbox-field {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+}
+
+.terms-checkbox {
+  margin-top: 0.125rem;
+  width: 16px;
+  height: 16px;
+  accent-color: var(--primary-color);
+}
+
+.terms-label {
+  font-size: 0.9rem;
+  line-height: 1.4;
+  color: var(--text-color);
+  cursor: pointer;
+}
+
+.terms-label a {
+  color: var(--primary-color);
+  text-decoration: none;
+}
+
+.terms-label a:hover {
+  text-decoration: underline;
+}
+
+.error-text {
+  color: var(--red-500);
+  font-size: 0.8rem;
+  margin-top: 0.25rem;
+}
+
+/* Navigation */
+.navigation-section {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.back-button {
+  color: var(--text-color-secondary);
+}
+
+/* Security Notice */
+.security-notice {
+  background: var(--surface-50);
+  border: 1px solid var(--surface-200);
+  border-radius: 8px;
+  padding: 1.5rem;
+  margin-top: 2rem;
+}
+
+.security-content {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+}
+
+.security-content i {
+  color: var(--green-500);
+  font-size: 1.5rem;
+  margin-top: 0.25rem;
+}
+
+.security-text h4 {
+  margin: 0 0 0.5rem 0;
+  color: var(--text-color);
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.security-text p {
+  margin: 0;
+  color: var(--text-color-secondary);
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+  .checkout-layout {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+  
+  .plan-summary {
+    order: 2;
+  }
+  
+  .payment-section {
+    order: 1;
+  }
+}
+
+@media (max-width: 768px) {
+  .checkout-container {
+    padding: 1rem;
+  }
+  
+  .checkout-header h1 {
+    font-size: 1.5rem;
+  }
+  
+  .subtitle {
+    font-size: 1rem;
+  }
+  
+  .plan-header {
+    flex-direction: column;
+    gap: 0.5rem;
+    text-align: center;
+  }
+  
+  .plan-price {
+    text-align: center;
+  }
+  
+  .coupon-input {
+    flex-direction: column;
+  }
+  
+  .payment-section {
+    padding: 1rem;
+  }
+  
+  .security-content {
+    flex-direction: column;
+    text-align: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .checkout-header h1 {
+    font-size: 1.25rem;
+  }
+  
+  .plan-price .amount {
+    font-size: 1.25rem;
+  }
+  
+  .total-amount {
+    font-size: 1.1rem;
+  }
+  
+  .terms-section {
+    padding: 0.75rem;
+  }
+  
+  .security-notice {
+    padding: 1rem;
+  }
+}
+
+/* Animation */
+.checkout-content {
+  animation: fadeIn 0.5s ease-in;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Processing State */
+.processing {
+  pointer-events: none;
+  opacity: 0.7;
+}
+
+/* Focus States */
+.terms-checkbox:focus {
+  outline: 2px solid var(--primary-color);
+  outline-offset: 2px;
+}
+
+/* Hover Effects */
+.plan-features li {
+  transition: color 0.2s ease;
+}
+
+.plan-features li:hover {
+  color: var(--primary-color);
+}
+
+.back-button:hover {
+  background: var(--surface-100) !important;
+}

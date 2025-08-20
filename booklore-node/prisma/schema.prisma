@@ -1,0 +1,461 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                Int                 @id @default(autoincrement())
+  email             String              @unique
+  name              String?
+  password          String?
+  avatar            String?
+  role              Role                @default(USER)
+  isActive          Boolean             @default(true)
+  emailVerified     Boolean             @default(false)
+  stripeCustomerId  String?             @unique
+  createdAt         DateTime            @default(now())
+  updatedAt         DateTime            @updatedAt
+  
+  // 关系
+  ownedLibraries    Library[]           @relation("LibraryOwner")
+  libraryMembers    LibraryMember[]
+  subscriptions     Subscription[]
+  bookProgress      UserBookProgress[]
+  refreshTokens     RefreshToken[]
+  emailRecipients   EmailRecipient[]
+  opdsUser          OpdsUser?
+  metadataHistory   MetadataHistory[]
+  metadataTemplates MetadataTemplate[]
+  fileTransactions  FileTransaction[]
+  notifications     Notification[]
+  notificationPreference NotificationPreference?
+  paymentRetryAttempts PaymentRetryAttempt[]
+  
+  @@map("users")
+}
+
+model Library {
+  id          Int             @id @default(autoincrement())
+  name        String
+  description String?
+  isPublic    Boolean         @default(false)
+  settings    Json?
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+  
+  // 关系
+  ownerId     Int
+  owner       User            @relation("LibraryOwner", fields: [ownerId], references: [id], onDelete: Cascade)
+  members     LibraryMember[]
+  shelves     Shelf[]
+  books       Book[]
+  
+  @@map("libraries")
+}
+
+model LibraryMember {
+  id        Int           @id @default(autoincrement())
+  role      LibraryRole   @default(READER)
+  joinedAt  DateTime      @default(now())
+  
+  // 关系
+  userId    Int
+  libraryId Int
+  user      User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  library   Library       @relation(fields: [libraryId], references: [id], onDelete: Cascade)
+  
+  @@unique([userId, libraryId])
+  @@map("library_members")
+}
+
+model Shelf {
+  id          Int       @id @default(autoincrement())
+  name        String
+  description String?
+  color       String?
+  order       Int       @default(0)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  
+  // 关系
+  libraryId   Int
+  library     Library   @relation(fields: [libraryId], references: [id], onDelete: Cascade)
+  books       Book[]
+  
+  @@map("shelves")
+}
+
+model Book {
+  id            Int               @id @default(autoincrement())
+  title         String
+  author        String?
+  isbn          String?
+  language      String?
+  publisher     String?
+  publishDate   DateTime?
+  description   String?
+  filePath      String
+  fileName      String
+  fileSize      Int
+  fileType      String
+  mimeType      String
+  coverImage    String?
+  metadata      Json?
+  genres        String[]          @default([])
+  rating        Float?
+  pageCount     Int?
+  status        BookStatus        @default(PROCESSING)
+  error         String?
+  processedAt   DateTime?
+  searchVector  Unsupported("tsvector")?  @map("search_vector") // PostgreSQL tsvector for full-text search
+  createdAt     DateTime          @default(now())
+  updatedAt     DateTime          @updatedAt
+  
+  // 关系
+  libraryId     Int
+  shelfId       Int?
+  library       Library           @relation(fields: [libraryId], references: [id], onDelete: Cascade)
+  shelf         Shelf?            @relation(fields: [shelfId], references: [id], onDelete: SetNull)
+  chapters      Chapter[]
+  userProgress  UserBookProgress[]
+  metadataJobs  MetadataFetchJob[]
+  metadataHistory MetadataHistory[]
+  
+  @@map("books")
+}
+
+model Chapter {
+  id        Int      @id @default(autoincrement())
+  title     String
+  href      String
+  order     Int
+  content   String?
+  
+  // 关系
+  bookId    Int
+  book      Book     @relation(fields: [bookId], references: [id], onDelete: Cascade)
+  
+  @@map("chapters")
+}
+
+model UserBookProgress {
+  id            Int      @id @default(autoincrement())
+  progress      Float    @default(0) // 0-100
+  currentPage   Int?
+  currentChapter Int?
+  lastReadAt    DateTime @default(now())
+  
+  // 关系
+  userId        Int
+  bookId        Int
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  book          Book     @relation(fields: [bookId], references: [id], onDelete: Cascade)
+  
+  @@unique([userId, bookId])
+  @@map("user_book_progress")
+}
+
+model Subscription {
+  id                String            @id @default(cuid())
+  plan              String            @default("free") // SubscriptionPlan enum as string
+  stripeCustomerId  String?
+  stripeSubscriptionId String?
+  stripePriceId     String?
+  status            SubscriptionStatus @default(ACTIVE)
+  currentPeriodStart DateTime?
+  currentPeriodEnd   DateTime?
+  trialStart        DateTime?
+  trialEnd          DateTime?
+  cancelAtPeriodEnd Boolean           @default(false)
+  canceledAt        DateTime?
+  createdAt         DateTime          @default(now())
+  updatedAt         DateTime          @updatedAt
+  
+  // 关系
+  userId            Int               @unique
+  user              User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@map("subscriptions")
+}
+
+model RefreshToken {
+  id        String   @id @default(cuid())
+  token     String   @unique
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+  
+  // 关系
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@map("refresh_tokens")
+}
+
+model BookdropFile {
+  id            Int               @id @default(autoincrement())
+  filePath      String            @unique
+  fileName      String
+  fileSize      Int
+  fileType      String?
+  status        BookdropStatus    @default(PENDING)
+  metadata      Json?
+  error         String?
+  createdAt     DateTime          @default(now())
+  updatedAt     DateTime          @updatedAt
+  
+  @@map("bookdrop_files")
+}
+
+model EmailProvider {
+  id        Int      @id @default(autoincrement())
+  name      String
+  host      String
+  port      Int
+  secure    Boolean  @default(false)
+  username  String
+  password  String
+  isDefault Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  @@map("email_providers")
+}
+
+model EmailRecipient {
+  id        Int      @id @default(autoincrement())
+  email     String
+  name      String?
+  isDefault Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  // 关系
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@unique([userId, email])
+  @@map("email_recipients")
+}
+
+model OpdsUser {
+  id        Int      @id @default(autoincrement())
+  username  String   @unique
+  password  String
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  // 关系
+  userId    Int      @unique
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@map("opds_users")
+}
+
+model AppSetting {
+  id        Int      @id @default(autoincrement())
+  key       String   @unique
+  value     Json
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  @@map("app_settings")
+}
+
+model MetadataFetchJob {
+  id          String            @id @default(cuid())
+  bookId      Int
+  status      JobStatus         @default(PENDING)
+  provider    String
+  query       String
+  result      Json?
+  error       String?
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+  
+  // 关系
+  book        Book              @relation(fields: [bookId], references: [id], onDelete: Cascade)
+  
+  @@map("metadata_fetch_jobs")
+}
+
+model MetadataHistory {
+  id        Int      @id @default(autoincrement())
+  bookId    Int
+  fieldName String
+  oldValue  Json?
+  newValue  Json?
+  source    String   // MetadataSource or 'manual'
+  reason    String?
+  timestamp DateTime @default(now())
+  
+  // 关系
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  book      Book     @relation(fields: [bookId], references: [id], onDelete: Cascade)
+  
+  @@map("metadata_history")
+}
+
+model MetadataTemplate {
+  id          Int      @id @default(autoincrement())
+  name        String
+  description String?
+  fields      Json     // Array of MetadataTemplateField
+  isPublic    Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  // 关系
+  userId      Int
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@map("metadata_templates")
+}
+
+model FileTransaction {
+  id          String   @id @default(cuid())
+  userId      Int
+  type        String   // FileTransactionType
+  status      String   // FileTransactionStatus
+  operations  Json     // Array of FileOperation
+  error       String?
+  createdAt   DateTime @default(now())
+  completedAt DateTime?
+  rollbackAt  DateTime?
+  
+  // 关系
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@map("file_transactions")
+}
+
+model Notification {
+  id          String            @id @default(cuid())
+  userId      Int
+  type        NotificationType
+  title       String
+  message     String
+  data        Json?             // 额外的通知数据
+  isRead      Boolean           @default(false)
+  actionUrl   String?           // 可选的操作链接
+  actionText  String?           // 操作按钮文本
+  expiresAt   DateTime?         // 通知过期时间
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+  
+  // 关系
+  user        User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@index([userId, createdAt])
+  @@index([userId, isRead])
+  @@index([expiresAt])
+  @@map("notifications")
+}
+
+model NotificationPreference {
+  id                    Int     @id @default(autoincrement())
+  userId                Int     @unique
+  emailNotifications    Boolean @default(true)
+  pushNotifications     Boolean @default(true)
+  paymentNotifications  Boolean @default(true)
+  subscriptionNotifications Boolean @default(true)
+  systemNotifications   Boolean @default(true)
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+  
+  // 关系
+  user                  User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@map("notification_preferences")
+}
+
+model PaymentRetryAttempt {
+  id            String                @id @default(cuid())
+  invoiceId     String
+  userId        Int
+  attemptNumber Int
+  status        PaymentRetryStatus
+  errorMessage  String?
+  nextRetryAt   DateTime?
+  createdAt     DateTime              @default(now())
+  updatedAt     DateTime              @updatedAt
+  
+  // 关系
+  user          User                  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@index([invoiceId])
+  @@index([userId, createdAt])
+  @@index([nextRetryAt])
+  @@map("payment_retry_attempts")
+}
+
+// 枚举类型
+enum Role {
+  ADMIN
+  USER
+}
+
+enum LibraryRole {
+  ADMIN
+  EDITOR
+  READER
+}
+
+enum BookStatus {
+  PROCESSING
+  COMPLETED
+  FAILED
+}
+
+enum SubscriptionStatus {
+  ACTIVE
+  CANCELED
+  INCOMPLETE
+  INCOMPLETE_EXPIRED
+  PAST_DUE
+  TRIALING
+  UNPAID
+}
+
+enum BookdropStatus {
+  PENDING
+  PROCESSING
+  COMPLETED
+  FAILED
+  DISCARDED
+}
+
+enum JobStatus {
+  PENDING
+  RUNNING
+  COMPLETED
+  FAILED
+}
+
+enum NotificationType {
+  PAYMENT_SUCCESS
+  PAYMENT_FAILED
+  SUBSCRIPTION_RENEWED
+  SUBSCRIPTION_EXPIRED
+  SUBSCRIPTION_CHANGED
+  TRIAL_ENDING
+  SYSTEM_ANNOUNCEMENT
+  BOOK_PROCESSING_COMPLETE
+  BOOK_PROCESSING_FAILED
+}
+
+enum PaymentRetryStatus {
+  PENDING
+  RETRYING
+  SUCCESS
+  FAILED
+  ABANDONED
+}

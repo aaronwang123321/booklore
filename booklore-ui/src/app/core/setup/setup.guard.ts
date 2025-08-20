@@ -4,8 +4,8 @@ import {
   Router,
   UrlTree
 } from '@angular/router';
-import {Observable} from 'rxjs';
-import {map} from 'rxjs/operators';
+import {Observable, of} from 'rxjs';
+import {map, catchError} from 'rxjs/operators';
 import {HttpClient} from '@angular/common/http';
 import {API_CONFIG} from '../../config/api-config';
 
@@ -20,12 +20,15 @@ export class SetupGuard implements CanActivate {
   private router = inject(Router);
 
   canActivate(): Observable<boolean | UrlTree> {
-    return this.http.get<any>(`${this.url}/status`).pipe(
+    return this.http.get<{ data: { isSetupComplete: boolean } }>(`${this.url}/status`).pipe(
       map(response => {
-        if (response?.data === true) {
+        if (response?.data?.isSetupComplete === true) {
           return this.router.createUrlTree(['/login']);
         }
         return true;
+      }),
+      catchError(() => {
+        return of(true);
       })
     );
   }

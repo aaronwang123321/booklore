@@ -17,14 +17,14 @@
 
         <form class="flex flex-col gap-4" #loginForm="ngForm" (ngSubmit)="login()">
           <div class="flex flex-col gap-2">
-            <label for="username" class="text-lg font-medium">Username</label>
+            <label for="username" class="text-lg font-medium">Email</label>
             <input
               pInputText
               id="username"
               name="username"
               required
               [(ngModel)]="username"
-              placeholder="Enter your username"
+              placeholder="Enter your email"
               class="w-full md:w-[27rem]"
             />
           </div>

@@ -1,7 +1,7 @@
 export const environment = {
   production: false,
   API_CONFIG: {
-    BASE_URL: 'http://localhost:8080',
-    BROKER_URL: 'ws://localhost:8080/ws',
+    BASE_URL: 'http://localhost:3000',
+    BROKER_URL: 'http://localhost:3000',
   },
 };

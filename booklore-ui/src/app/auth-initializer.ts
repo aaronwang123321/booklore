@@ -1,24 +1,36 @@
 import {inject} from '@angular/core';
-import {Router} from '@angular/router';
-import {OAuthEvent, OAuthService} from 'angular-oauth2-oidc';
+import {OAuthService} from 'angular-oauth2-oidc';
+import {Subscription} from 'rxjs';
 import {AppSettingsService} from './core/service/app-settings.service';
 import {AuthService, websocketInitializer} from './core/service/auth.service';
-import {filter} from 'rxjs/operators';
 import {AuthInitializationService} from './auth-initialization-service';
+import {UserService} from './settings/user-management/user.service';
 
 export function initializeAuthFactory() {
   return () => {
     const oauthService = inject(OAuthService);
     const appSettingsService = inject(AppSettingsService);
     const authService = inject(AuthService);
-    const router = inject(Router);
     const authInitService = inject(AuthInitializationService);
+    const userService = inject(UserService);
+
+    // Load app settings first
+    appSettingsService.loadAppSettings();
 
     return new Promise<void>((resolve) => {
-      const sub = appSettingsService.appSettings$.subscribe(settings => {
-        if (!settings) return;
+      let sub: Subscription | null = null;
+      
+      sub = appSettingsService.appSettings$.subscribe(settings => {
+        if (!settings) {
+          // If settings failed to load, continue with default behavior
+          console.warn('[Auth Init] App settings failed to load, continuing with default configuration');
+          if (sub) sub.unsubscribe();
+          authInitService.markAsInitialized();
+          resolve();
+          return;
+        }
 
-        sub.unsubscribe();
+        if (sub) sub.unsubscribe();
 
         if (settings.oidcEnabled && settings.oidcProviderDetails) {
           const details = settings.oidcProviderDetails;
@@ -54,6 +66,7 @@ export function initializeAuthFactory() {
             });
 
         } else if (settings.remoteAuthEnabled) {
+          if (sub) sub.unsubscribe();
           authService.remoteLogin().subscribe({
             next: () => {
               authInitService.markAsInitialized();
@@ -67,6 +80,18 @@ export function initializeAuthFactory() {
           });
 
         } else {
+          // 检查是否有本地存储的内部认证token
+          const internalToken = authService.getInternalAccessToken();
+          
+          if (internalToken) {
+            console.log('[Auth Init] Found internal access token, loading user profile');
+            // 有token，尝试加载用户信息
+            userService.loadCurrentUser();
+            // 初始化WebSocket连接
+            authService.initializeWebSocketConnection();
+          }
+          
+          if (sub) sub.unsubscribe();
           authInitService.markAsInitialized();
           resolve();
         }

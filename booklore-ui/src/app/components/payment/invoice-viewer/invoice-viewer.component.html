@@ -1,0 +1,160 @@
+<div class="invoice-viewer-container">
+  <!-- 加载状态 -->
+  <div *ngIf="isLoading" class="loading">
+    <div class="spinner"></div>
+    <p>正在加载发票...</p>
+  </div>
+
+  <!-- 错误信息 -->
+  <div *ngIf="error" class="error-message">
+    <div class="error-card">
+      <h4>加载失败</h4>
+      <p>{{ error }}</p>
+      <div class="error-actions">
+        <button class="btn-primary" (click)="loadInvoice()">重试</button>
+        <button class="btn-secondary" (click)="goBack()">返回</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 发票内容 -->
+  <div *ngIf="!isLoading && !error && invoice" class="invoice-content">
+    <!-- 操作栏 -->
+    <div class="actions-bar no-print">
+      <button class="btn-secondary" (click)="goBack()">
+        ← 返回
+      </button>
+      
+      <div class="action-buttons">
+        <button class="btn-primary" (click)="downloadInvoice()">
+          📥 下载PDF
+        </button>
+        <button class="btn-secondary" (click)="printInvoice()">
+          🖨️ 打印
+        </button>
+      </div>
+    </div>
+
+    <!-- 发票主体 -->
+    <div class="invoice-document">
+      <!-- 发票头部 -->
+      <div class="invoice-header">
+        <div class="company-info">
+          <h1 class="company-name">BookLore</h1>
+          <p class="company-tagline">数字图书管理平台</p>
+        </div>
+        
+        <div class="invoice-meta">
+          <h2 class="invoice-title">发票</h2>
+          <div class="invoice-details">
+            <div class="detail-row">
+              <span class="label">发票号码:</span>
+              <span class="value">{{ invoice?.number }}</span>
+            </div>
+            <div class="detail-row">
+              <span class="label">开票日期:</span>
+              <span class="value">{{ formatDate(invoice?.createdAt!) }}</span>
+            </div>
+            <div *ngIf="invoice?.dueDate" class="detail-row">
+              <span class="label">到期日期:</span>
+              <span class="value">{{ formatDate(invoice?.dueDate!) }}</span>
+            </div>
+            <div class="detail-row">
+              <span class="label">状态:</span>
+              <span class="value status-badge" [class]="getStatusClass(invoice?.status!)">
+                {{ getStatusText(invoice?.status!) }}
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 客户信息 -->
+      <div class="customer-section">
+        <div class="section-title">
+          <h3>账单信息</h3>
+        </div>
+        <div class="customer-info">
+          <div class="customer-name">{{ invoice?.customer?.name }}</div>
+          <div class="customer-email">{{ invoice?.customer?.email }}</div>
+          <div *ngIf="getFormattedAddress(invoice?.customer?.address)" class="customer-address">
+            {{ getFormattedAddress(invoice?.customer?.address) }}
+          </div>
+        </div>
+      </div>
+
+      <!-- 发票项目 -->
+      <div class="items-section">
+        <div class="section-title">
+          <h3>发票明细</h3>
+        </div>
+        
+        <div class="items-table">
+          <div class="table-header">
+            <div class="col-description">描述</div>
+            <div class="col-quantity">数量</div>
+            <div class="col-unit-price">单价</div>
+            <div class="col-amount">金额</div>
+          </div>
+          
+          <div *ngFor="let item of invoice.lineItems" class="table-row">
+            <div class="col-description">{{ item.description }}</div>
+            <div class="col-quantity">{{ item.quantity }}</div>
+            <div class="col-unit-price">{{ formatCurrency(item.unitAmount, invoice?.currency!) }}</div>
+            <div class="col-amount">{{ formatCurrency(item.amount, invoice?.currency!) }}</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 总计 -->
+      <div class="totals-section">
+        <div class="totals-table">
+          <div class="total-row">
+            <span class="total-label">小计:</span>
+            <span class="total-value">{{ formatCurrency(invoice?.subtotal!, invoice?.currency!) }}</span>
+          </div>
+          
+          <div *ngIf="invoice?.tax" class="total-row">
+            <span class="total-label">税费:</span>
+            <span class="total-value">{{ formatCurrency(invoice?.tax!, invoice?.currency!) }}</span>
+          </div>
+          
+          <div class="total-row final-total">
+            <span class="total-label">总计:</span>
+            <span class="total-value">{{ formatCurrency(invoice?.total!, invoice?.currency!) }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 支付信息 -->
+      <div *ngIf="invoice?.paidAt" class="payment-section">
+        <div class="section-title">
+          <h3>支付信息</h3>
+        </div>
+        <div class="payment-info">
+          <div class="payment-status success">
+            ✅ 已于 {{ formatDateTime(invoice?.paidAt!) }} 支付
+          </div>
+        </div>
+      </div>
+
+      <!-- 发票说明 -->
+      <div *ngIf="invoice?.description" class="notes-section">
+        <div class="section-title">
+          <h3>备注</h3>
+        </div>
+        <div class="notes-content">
+          {{ invoice?.description }}
+        </div>
+      </div>
+
+      <!-- 发票底部 -->
+      <div class="invoice-footer">
+        <div class="footer-text">
+          <p>感谢您使用 BookLore 服务！</p>
+          <p class="small-text">如有任何疑问，请联系我们的客服团队。</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

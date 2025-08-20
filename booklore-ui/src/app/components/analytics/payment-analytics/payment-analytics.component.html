@@ -1,0 +1,244 @@
+<!-- 支付分析页面 -->
+<div class="analytics-container">
+  <!-- 页面头部 -->
+  <div class="page-header">
+    <div class="header-content">
+      <h1>支付分析</h1>
+      <p>查看收入统计、订阅分析和支付趋势</p>
+    </div>
+    
+    <div class="header-actions">
+      <!-- 时间范围选择 -->
+      <div class="period-selector">
+        <label for="period">时间范围:</label>
+        <select id="period" [(ngModel)]="selectedPeriod" (change)="onPeriodChange()" class="form-select">
+          <option *ngFor="let option of periodOptions" [value]="option.value">
+            {{ option.label }}
+          </option>
+        </select>
+      </div>
+      
+      <!-- 操作按钮 -->
+      <div class="action-buttons">
+        <button type="button" class="btn btn-outline-primary" (click)="refreshData()" [disabled]="loading">
+          <span *ngIf="loading" class="spinner-small"></span>
+          <span *ngIf="!loading">🔄</span>
+          刷新
+        </button>
+        <button type="button" class="btn btn-primary" (click)="exportData()" [disabled]="loading">
+          📊 导出数据
+        </button>
+      </div>
+    </div>
+  </div>
+  
+  <!-- 加载状态 -->
+  <div *ngIf="loading" class="loading-container">
+    <div class="spinner"></div>
+    <p>正在加载分析数据...</p>
+  </div>
+  
+  <!-- 错误信息 -->
+  <div *ngIf="error && !loading" class="error-container">
+    <div class="error-card">
+      <h4>加载失败</h4>
+      <p>{{ error }}</p>
+      <button type="button" class="btn btn-primary" (click)="refreshData()">
+        重新加载
+      </button>
+    </div>
+  </div>
+  
+  <!-- 分析内容 -->
+  <div *ngIf="!loading && !error" class="analytics-content">
+    
+    <!-- 关键指标卡片 -->
+    <div class="metrics-grid">
+      <!-- 总收入 -->
+      <div class="metric-card revenue-card">
+        <div class="metric-header">
+          <h3>总收入</h3>
+          <div class="metric-icon">💰</div>
+        </div>
+        <div class="metric-value">
+          <span class="amount">{{ formatCurrency(getTotalRevenue()) }}</span>
+          <div class="growth" [ngClass]="getGrowthClass(getRevenueGrowth())">
+            <span class="growth-icon">{{ getGrowthIcon(getRevenueGrowth()) }}</span>
+            <span class="growth-value">{{ formatPercentage(getRevenueGrowth()) }}</span>
+          </div>
+        </div>
+      </div>
+      
+      <!-- 活跃订阅 -->
+      <div class="metric-card subscription-card" *ngIf="subscriptionMetrics">
+        <div class="metric-header">
+          <h3>活跃订阅</h3>
+          <div class="metric-icon">📊</div>
+        </div>
+        <div class="metric-value">
+          <span class="amount">{{ formatNumber(subscriptionMetrics.activeSubscriptions) }}</span>
+          <div class="sub-metric">
+            <span>总订阅: {{ formatNumber(subscriptionMetrics.totalSubscriptions) }}</span>
+          </div>
+        </div>
+      </div>
+      
+      <!-- 流失率 -->
+      <div class="metric-card churn-card" *ngIf="subscriptionMetrics">
+        <div class="metric-header">
+          <h3>流失率</h3>
+          <div class="metric-icon">📉</div>
+        </div>
+        <div class="metric-value">
+          <span class="amount">{{ formatPercentage(subscriptionMetrics.churnRate) }}</span>
+          <div class="sub-metric">
+            <span>已取消: {{ formatNumber(subscriptionMetrics.canceledSubscriptions) }}</span>
+          </div>
+        </div>
+      </div>
+      
+      <!-- 支付成功率 -->
+      <div class="metric-card payment-card">
+        <div class="metric-header">
+          <h3>支付成功率</h3>
+          <div class="metric-icon">✅</div>
+        </div>
+        <div class="metric-value">
+          <span class="amount">{{ formatPercentage(getPaymentSuccessRate()) }}</span>
+          <div class="sub-metric">
+            <span>总交易: {{ formatNumber(getTotalTransactions()) }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- 图表区域 -->
+    <div class="charts-section">
+      
+      <!-- 收入趋势图 -->
+      <div class="chart-container">
+        <div class="chart-header">
+          <h3>收入趋势</h3>
+          <p>{{ selectedPeriod === '7d' ? '最近7天' : selectedPeriod === '30d' ? '最近30天' : selectedPeriod === '90d' ? '最近90天' : '最近1年' }}的收入变化</p>
+        </div>
+        <div class="chart-content">
+          <div *ngIf="revenueData.length === 0" class="no-data">
+            <p>暂无收入数据</p>
+          </div>
+          <div *ngIf="revenueData.length > 0" class="chart-wrapper">
+            <!-- 这里可以集成Chart.js或其他图表库 -->
+            <div class="chart-placeholder">
+              <p>收入趋势图 (需要集成图表库)</p>
+              <div class="data-preview">
+                <div *ngFor="let item of revenueData.slice(0, 5)" class="data-item">
+                  <span class="date">{{ item.period }}</span>
+                  <span class="amount">{{ formatCurrency(item.amount) }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- 支付趋势图 -->
+      <div class="chart-container">
+        <div class="chart-header">
+          <h3>支付趋势</h3>
+          <p>成功与失败支付的对比</p>
+        </div>
+        <div class="chart-content">
+          <div *ngIf="paymentTrends.length === 0" class="no-data">
+            <p>暂无支付趋势数据</p>
+          </div>
+          <div *ngIf="paymentTrends.length > 0" class="chart-wrapper">
+            <!-- 这里可以集成Chart.js或其他图表库 -->
+            <div class="chart-placeholder">
+              <p>支付趋势图 (需要集成图表库)</p>
+              <div class="data-preview">
+                <div *ngFor="let item of paymentTrends.slice(0, 5)" class="data-item">
+                  <span class="date">{{ item.date }}</span>
+                  <span class="success">成功: {{ item.successCount }}</span>
+                  <span class="failure">失败: {{ item.failureCount }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- 详细数据表格 -->
+    <div class="tables-section">
+      
+      <!-- 热门订阅计划 -->
+      <div class="table-container">
+        <div class="table-header">
+          <h3>热门订阅计划</h3>
+          <p>按收入排序的订阅计划</p>
+        </div>
+        <div class="table-content">
+          <div *ngIf="topPlans.length === 0" class="no-data">
+            <p>暂无订阅计划数据</p>
+          </div>
+          <table *ngIf="topPlans.length > 0" class="data-table">
+            <thead>
+              <tr>
+                <th>计划名称</th>
+                <th>订阅数</th>
+                <th>收入</th>
+                <th>占比</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let plan of topPlans">
+                <td class="plan-name">{{ plan.planName }}</td>
+                <td class="subscribers">{{ formatNumber(plan.subscribers) }}</td>
+                <td class="revenue">{{ formatCurrency(plan.revenue) }}</td>
+                <td class="percentage">
+                  <div class="percentage-bar">
+                    <div class="percentage-fill" [style.width.%]="plan.percentage"></div>
+                    <span class="percentage-text">{{ formatPercentage(plan.percentage) }}</span>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      
+      <!-- 订阅趋势表格 -->
+      <div class="table-container" *ngIf="subscriptionMetrics && subscriptionMetrics.subscriptionTrends.length > 0">
+        <div class="table-header">
+          <h3>订阅趋势</h3>
+          <p>每月新增、取消和净增长</p>
+        </div>
+        <div class="table-content">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>月份</th>
+                <th>新增</th>
+                <th>取消</th>
+                <th>净增长</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let trend of subscriptionMetrics.subscriptionTrends">
+                <td class="month">{{ trend.month }}</td>
+                <td class="new-subs">+{{ formatNumber(trend.new) }}</td>
+                <td class="canceled-subs">-{{ formatNumber(trend.canceled) }}</td>
+                <td class="net-growth" [ngClass]="{
+                  'positive': trend.net > 0,
+                  'negative': trend.net < 0,
+                  'neutral': trend.net === 0
+                }">
+                  {{ trend.net > 0 ? '+' : '' }}{{ formatNumber(trend.net) }}
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

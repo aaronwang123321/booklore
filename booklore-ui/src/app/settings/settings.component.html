@@ -9,7 +9,7 @@
           <p-tab [value]="SettingsTab.ViewPreferences">
             <i class="pi pi-desktop"></i> View
           </p-tab>
-          @if (userData.permissions.admin) {
+          @if (userData.role === 'ADMIN') {
             <p-tab [value]="SettingsTab.MetadataSettings">
               <i class="pi pi-sliders-h"></i> Metadata
             </p-tab>
@@ -37,7 +37,7 @@
           <p-tabpanel [value]="SettingsTab.ViewPreferences">
             <app-view-preferences-parent></app-view-preferences-parent>
           </p-tabpanel>
-          @if (userData.permissions.admin) {
+          @if (userData.role === 'ADMIN') {
             <p-tabpanel [value]="SettingsTab.MetadataSettings">
               <app-metadata-settings-component></app-metadata-settings-component>
             </p-tabpanel>

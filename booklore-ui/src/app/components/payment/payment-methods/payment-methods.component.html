@@ -1,0 +1,109 @@
+<div class="payment-methods-container">
+  <div class="header">
+    <h2>支付方式管理</h2>
+    <p>管理您的支付方式，设置默认支付方式</p>
+  </div>
+
+  <!-- 加载状态 -->
+  <div *ngIf="isLoading" class="loading">
+    <div class="spinner"></div>
+    <p>正在加载支付方式...</p>
+  </div>
+
+  <!-- 错误信息 -->
+  <div *ngIf="error" class="error-message">
+    <div class="error-card">
+      <h4>加载失败</h4>
+      <p>{{ error }}</p>
+      <button class="btn-primary" (click)="loadPaymentMethods()">重试</button>
+    </div>
+  </div>
+
+  <!-- 支付方式内容 -->
+  <div *ngIf="!isLoading && !error" class="content">
+    <!-- 操作栏 -->
+    <div class="actions-bar">
+      <button 
+        class="btn-primary" 
+        (click)="addPaymentMethod()" 
+        [disabled]="isAddingPaymentMethod">
+        <span *ngIf="!isAddingPaymentMethod">+ 添加支付方式</span>
+        <span *ngIf="isAddingPaymentMethod">正在添加...</span>
+      </button>
+      
+      <button class="btn-secondary" (click)="openCustomerPortal()">
+        管理支付设置
+      </button>
+    </div>
+
+    <!-- 支付方式列表 -->
+    <div class="payment-methods-list">
+      <div *ngIf="paymentMethods.length === 0" class="no-payment-methods">
+        <div class="empty-state">
+          <div class="empty-icon">💳</div>
+          <h3>暂无支付方式</h3>
+          <p>添加支付方式以便进行订阅和购买</p>
+          <button class="btn-primary" (click)="addPaymentMethod()">
+            添加第一个支付方式
+          </button>
+        </div>
+      </div>
+
+      <div *ngFor="let method of paymentMethods" class="payment-method-card" 
+           [class.default]="method.isDefault"
+           [class.expiring]="isExpiringSoon(method)">
+        
+        <!-- 卡片头部 -->
+        <div class="card-header">
+          <div class="method-info">
+            <span class="method-icon">{{ getPaymentMethodIcon(method.type, method.brand) }}</span>
+            <div class="method-details">
+              <div class="method-name">{{ getPaymentMethodDisplay(method) }}</div>
+              <div class="method-meta">
+                <span *ngIf="getExpiryDisplay(method)" class="expiry">
+                  到期: {{ getExpiryDisplay(method) }}
+                </span>
+                <span class="added-date">添加于 {{ formatDate(method.createdAt) }}</span>
+              </div>
+            </div>
+          </div>
+          
+          <div class="method-badges">
+            <span *ngIf="method.isDefault" class="badge badge-primary">默认</span>
+            <span *ngIf="isExpiringSoon(method)" class="badge badge-warning">即将到期</span>
+          </div>
+        </div>
+
+        <!-- 卡片操作 -->
+        <div class="card-actions">
+          <button 
+            *ngIf="!method.isDefault" 
+            class="btn-link" 
+            (click)="setDefaultPaymentMethod(method.id)">
+            设为默认
+          </button>
+          
+          <button 
+            class="btn-danger" 
+            (click)="deletePaymentMethod(method.id)"
+            [disabled]="method.isDefault && paymentMethods.length === 1">
+            删除
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 提示信息 -->
+    <div class="info-section">
+      <div class="info-card">
+        <h4>💡 支付方式说明</h4>
+        <ul>
+          <li>默认支付方式将用于自动续费和新订阅</li>
+          <li>您可以随时添加、删除或更改默认支付方式</li>
+          <li>即将到期的卡片会显示警告提醒</li>
+          <li>删除支付方式不会影响已有的订阅</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>

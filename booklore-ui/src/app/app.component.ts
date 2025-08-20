@@ -1,6 +1,5 @@
 import {Component, inject, OnInit} from '@angular/core';
-import {RxStompService} from './shared/websocket/rx-stomp.service';
-import {Message} from '@stomp/stompjs';
+import {SocketIOService} from './shared/websocket/socket-io.service';
 import {BookService} from './book/service/book.service';
 import {NotificationEventService} from './shared/websocket/notification-event.service';
 import {parseLogNotification} from './shared/websocket/model/log-notification.model';
@@ -25,7 +24,7 @@ export class AppComponent implements OnInit {
   loading = true;
   private authInit = inject(AuthInitializationService);
   private bookService = inject(BookService);
-  private rxStompService = inject(RxStompService);
+  private socketIOService = inject(SocketIOService);
   private notificationEventService = inject(NotificationEventService);
   private metadataProgressService = inject(MetadataProgressService);
   private bookdropFileService = inject(BookdropFileService);
@@ -37,34 +36,34 @@ export class AppComponent implements OnInit {
       this.loading = !ready;
     });
 
-    this.rxStompService.watch('/topic/book-add').subscribe((message: Message) => {
+    this.socketIOService.watch('/topic/book-add').subscribe((message: { body: string }) => {
       this.bookService.handleNewlyCreatedBook(JSON.parse(message.body));
     });
 
-    this.rxStompService.watch('/topic/books-remove').subscribe((message: Message) => {
+    this.socketIOService.watch('/topic/books-remove').subscribe((message: { body: string }) => {
       this.bookService.handleRemovedBookIds(JSON.parse(message.body));
     });
 
-    this.rxStompService.watch('/topic/book-metadata-update').subscribe((message: Message) => {
+    this.socketIOService.watch('/topic/book-metadata-update').subscribe((message: { body: string }) => {
       this.bookService.handleBookUpdate(JSON.parse(message.body));
     });
 
-    this.rxStompService.watch('/topic/book-metadata-batch-update').subscribe((message: Message) => {
+    this.socketIOService.watch('/topic/book-metadata-batch-update').subscribe((message: { body: string }) => {
       const updatedBooks = JSON.parse(message.body);
       this.bookService.handleMultipleBookUpdates(updatedBooks);
     });
 
-    this.rxStompService.watch('/topic/book-metadata-batch-progress').subscribe((message: Message) => {
+    this.socketIOService.watch('/topic/book-metadata-batch-progress').subscribe((message: { body: string }) => {
       const progress = JSON.parse(message.body) as MetadataBatchProgressNotification;
       this.metadataProgressService.handleIncomingProgress(progress);
     });
 
-    this.rxStompService.watch('/topic/log').subscribe((message: Message) => {
+    this.socketIOService.watch('/topic/log').subscribe((message: { body: string }) => {
       const logNotification = parseLogNotification(message.body);
       this.notificationEventService.handleNewNotification(logNotification);
     });
 
-    this.rxStompService.watch('/topic/bookdrop-file').subscribe((message: Message) => {
+    this.socketIOService.watch('/topic/bookdrop-file').subscribe((message: { body: string }) => {
       const notification = JSON.parse(message.body) as BookdropFileNotification;
       this.bookdropFileService.handleIncomingFile(notification);
     });

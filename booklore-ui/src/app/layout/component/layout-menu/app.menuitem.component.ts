@@ -12,6 +12,7 @@ import {UserService} from '../../../settings/user-management/user.service';
 import {DialogLauncherService} from '../../../dialog-launcher.service';
 
 @Component({
+  // eslint-disable-next-line @angular-eslint/component-selector
   selector: '[app-menuitem]',
   templateUrl: './app.menuitem.component.html',
   styleUrls: ['./app.menuitem.component.scss'],
@@ -37,6 +38,7 @@ import {DialogLauncherService} from '../../../dialog-launcher.service';
   ]
 })
 export class AppMenuitemComponent implements OnInit, OnDestroy {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   @Input() item: any;
   @Input() index!: number;
   @Input() @HostBinding('class.layout-root-menuitem') root!: boolean;
@@ -69,8 +71,8 @@ export class AppMenuitemComponent implements OnInit, OnDestroy {
   constructor(public router: Router, private menuService: MenuService, private userService: UserService, private dialogLauncher: DialogLauncherService) {
     this.userService.userState$.subscribe(userData => {
       if (userData) {
-        this.canManipulateLibrary = userData.permissions.canManipulateLibrary;
-        this.admin = userData.permissions.admin;
+        this.canManipulateLibrary = userData.role === 'ADMIN';
+        this.admin = userData.role === 'ADMIN';
       }
     });
     this.menuSourceSubscription = this.menuService.menuSource$.subscribe(value => {
@@ -145,7 +147,7 @@ export class AppMenuitemComponent implements OnInit, OnDestroy {
     }
   }
 
-  openDialog(item: any) {
+  openDialog(item: { type: 'library' | 'magicShelf' }) {
     if (item.type === 'library' && this.canManipulateLibrary) {
       this.dialogLauncher.openLibraryCreatorDialog();
     }

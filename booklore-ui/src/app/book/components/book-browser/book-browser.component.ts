@@ -34,7 +34,6 @@ import {HeaderFilter} from './filters/HeaderFilter';
 import {CoverScalePreferenceService} from './cover-scale-preference.service';
 import {BookSorter} from './sorting/BookSorter';
 import {BookDialogHelperService} from './BookDialogHelperService';
-import {DropdownModule} from 'primeng/dropdown';
 import {Checkbox} from 'primeng/checkbox';
 import {Popover} from 'primeng/popover';
 import {Slider} from 'primeng/slider';
@@ -84,7 +83,7 @@ const SORT_DIRECTION = {
   imports: [
     Button, VirtualScrollerModule, BookCardComponent, AsyncPipe, ProgressSpinner, Menu, InputText, FormsModule,
     BookTableComponent, BookFilterComponent, Tooltip, NgClass, PrimeTemplate, NgStyle, OverlayPanelModule,
-    DropdownModule, Checkbox, Popover, Slider, Select, Divider, MultiSelect, TieredMenu
+    Checkbox, Popover, Slider, Select, Divider, MultiSelect, TieredMenu
   ],
   providers: [SeriesCollapseFilter],
   animations: [
@@ -121,7 +120,7 @@ export class BookBrowserComponent implements OnInit, AfterViewInit {
   entity$: Observable<Library | Shelf | MagicShelf | null> | undefined;
   entityType$: Observable<EntityType> | undefined;
   searchTerm$ = new BehaviorSubject<string>('');
-  selectedFilter = new BehaviorSubject<Record<string, any> | null>(null);
+  selectedFilter = new BehaviorSubject<Record<string, unknown> | null>(null);
   selectedFilterMode = new BehaviorSubject<'and' | 'or'>('and');
   protected resetFilterSubject = new Subject<void>();
   entity: Library | Shelf | MagicShelf | null = null;
@@ -215,7 +214,6 @@ export class BookBrowserComponent implements OnInit, AfterViewInit {
       const sortParam = paramMap.get(QUERY_PARAMS.SORT);
       const directionParam = paramMap.get(QUERY_PARAMS.DIRECTION);
       const filterParams = paramMap.get(QUERY_PARAMS.FILTER);
-      const sidebarParam = paramMap.get(QUERY_PARAMS.SIDEBAR);
 
       const parsedFilters: Record<string, string[]> = {};
 
@@ -307,7 +305,7 @@ export class BookBrowserComponent implements OnInit, AfterViewInit {
         this.applySortOption(this.bookSorter.selectedSort);
       }
 
-      const queryParams: any = {
+      const queryParams: Record<string, string> = {
         [QUERY_PARAMS.VIEW]: this.currentViewMode,
         [QUERY_PARAMS.SORT]: this.bookSorter.selectedSort.field,
         [QUERY_PARAMS.DIRECTION]: this.bookSorter.selectedSort.direction === SortDirection.ASCENDING ? SORT_DIRECTION.ASCENDING : SORT_DIRECTION.DESCENDING,
@@ -328,7 +326,7 @@ export class BookBrowserComponent implements OnInit, AfterViewInit {
       this.changeDetectorRef.detectChanges();
     });
 
-    this.bookFilterComponent.filterSelected.subscribe((filters: Record<string, any> | null) => {
+    this.bookFilterComponent.filterSelected.subscribe((filters: Record<string, unknown> | null) => {
       if (this.settingFiltersFromUrl) return;
 
       this.selectedFilter.next(filters);
@@ -351,7 +349,7 @@ export class BookBrowserComponent implements OnInit, AfterViewInit {
     this.coverScalePreferenceService.setScale(this.coverScalePreferenceService.scaleFactor);
   }
 
-  onVisibleColumnsChange(selected: any[]) {
+  onVisibleColumnsChange(selected: { field: string; header: string }[]) {
     const allFields = this.bookTableComponent.allColumns.map(col => col.field);
     this.visibleColumns = selected.sort(
       (a, b) => allFields.indexOf(a.field) - allFields.indexOf(b.field)
@@ -427,6 +425,7 @@ export class BookBrowserComponent implements OnInit, AfterViewInit {
         });
       },
       reject: () => {
+        // User cancelled deletion
       }
     });
   }
@@ -435,7 +434,8 @@ export class BookBrowserComponent implements OnInit, AfterViewInit {
     this.seriesCollapseFilter.setCollapsed(value);
   }
 
-  applySortOption(sortOption: SortOption): void {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  applySortOption(_sortOption: SortOption): void {
     if (this.entityType === EntityType.ALL_BOOKS) {
       this.bookState$ = this.fetchAllBooks();
     } else if (this.entityType === EntityType.UNSHELVED) {
@@ -544,8 +544,8 @@ export class BookBrowserComponent implements OnInit, AfterViewInit {
     return (entity as Library).paths !== undefined;
   }
 
-  private isMagicShelf(entity: any): entity is MagicShelf {
-    return entity && 'filterJson' in entity;
+  private isMagicShelf(entity: unknown): entity is MagicShelf {
+    return typeof entity === 'object' && entity !== null && 'filterJson' in entity;
   }
 
   private getEntityInfoFromRoute(): Observable<{ entityId: number; entityType: EntityType }> {

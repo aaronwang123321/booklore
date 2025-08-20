@@ -136,7 +136,7 @@ export class AuthenticationSettingsComponent implements OnInit {
     const payload = [
       {
         key: AppSettingKey.OIDC_PROVIDER_DETAILS,
-        newValue: this.oidcProvider
+        newValue: this.oidcProvider as unknown
       }
     ];
     this.appSettingsService.saveSettings(payload).subscribe({

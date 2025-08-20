@@ -121,9 +121,11 @@ export class OpdsSettingsComponent implements OnInit {
 
   copyOpdsEndpoint() {
     navigator.clipboard.writeText(this.opdsEndpoint)
+      // eslint-disable-next-line @typescript-eslint/no-empty-function
       .then(() => {
       })
-      .catch(err => {
+      // eslint-disable-next-line @typescript-eslint/no-empty-function
+      .catch(() => {
       });
   }
 

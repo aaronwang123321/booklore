@@ -31,8 +31,8 @@
       <div class="flex gap-6">
         @if (userService.userState$ | async; as userData) {
           <li>
-            @if (userData.permissions.canManipulateLibrary || userData.permissions.admin) {
-              <a class="topbar-item" (click)="openLibraryCreatorDialog()" pTooltip="Create New Library" tooltipPosition="bottom">
+            @if (userData.role === 'ADMIN') {
+              <a class="topbar-item" tabindex="0" (click)="openLibraryCreatorDialog()" (keydown.enter)="openLibraryCreatorDialog()" (keydown.space)="openLibraryCreatorDialog()" pTooltip="Create New Library" tooltipPosition="bottom">
                 <i class="pi pi-plus-circle text-surface-100"></i>
               </a>
             }
@@ -40,15 +40,15 @@
         }
         @if (userService.userState$ | async; as userData) {
           <li>
-            @if (userData.permissions.canManipulateLibrary || userData.permissions.admin) {
-              <a class="topbar-item" (click)="openFileUploadDialog()" pTooltip="Upload Book" tooltipPosition="bottom">
+            @if (userData.role === 'ADMIN') {
+              <a class="topbar-item" tabindex="0" (click)="openFileUploadDialog()" (keydown.enter)="openFileUploadDialog()" (keydown.space)="openFileUploadDialog()" pTooltip="Upload Book" tooltipPosition="bottom">
                 <i class="pi pi-upload text-surface-100"></i>
               </a>
             }
           </li>
         }
         <li>
-          <a class="topbar-item" (click)="navigateToSettings()" pTooltip="Settings" tooltipPosition="bottom">
+          <a class="topbar-item" tabindex="0" (click)="navigateToSettings()" (keydown.enter)="navigateToSettings()" (keydown.space)="navigateToSettings()" pTooltip="Settings" tooltipPosition="bottom">
             <i class="pi pi-cog text-surface-100"></i>
           </a>
         </li>
@@ -83,7 +83,7 @@
           </p-popover>
         </li>
 
-        <li class="relative group overflow-hidden !border-transparent topbar-item" pTooltip="Love BookLore?" tooltipPosition="bottom" (click)="openGithubSupportDialog()">
+        <li class="relative group overflow-hidden !border-transparent topbar-item" tabindex="0" pTooltip="Love BookLore?" tooltipPosition="bottom" (click)="openGithubSupportDialog()" (keydown.enter)="openGithubSupportDialog()" (keydown.space)="openGithubSupportDialog()">
           <span
             style="animation-duration: 2s; background: conic-gradient(from 90deg, #f97316, #f59e0b, #eab308, #84cc16, #22c55e, #10b981, #14a8a6, #06b6d4, #0ea5e9, #3b82f6, #6366f1, #8b5cf6, #a855f7, #d946ef, #ec4899, #f43f5e)"
             class="absolute -top-5 -left-5 w-20 h-20 animate-spin">
@@ -138,7 +138,7 @@
       <p-popover #mobileMenu>
         <ul class="flex flex-col gap-1 w-48">
           @if (userService.userState$ | async; as userData) {
-            @if (userData.permissions.canManipulateLibrary || userData.permissions.admin) {
+            @if (userData.role === 'ADMIN') {
               <li>
                 <button
                   class="flex items-center gap-2 w-full text-left p-2 hover:bg-surface-200 dark:hover:bg-surface-700 rounded"

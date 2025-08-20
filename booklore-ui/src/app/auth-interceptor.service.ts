@@ -1,4 +1,4 @@
-import {HttpErrorResponse, HttpHandlerFn, HttpInterceptorFn, HttpRequest} from '@angular/common/http';
+import {HttpErrorResponse, HttpEvent, HttpHandlerFn, HttpInterceptorFn, HttpRequest} from '@angular/common/http';
 import {inject} from '@angular/core';
 import {Router} from '@angular/router';
 import {catchError, filter, switchMap, take} from 'rxjs/operators';
@@ -15,12 +15,14 @@ export const AuthInterceptorService: HttpInterceptorFn = (req, next: HttpHandler
   const token = internalToken || oidcToken;
 
   const isApiRequest = req.url.startsWith(`${API_CONFIG.BASE_URL}/api/`);
+  const isSetupRequest = req.url.includes('/api/v1/setup');
+  const isPublicSettingsRequest = req.url.includes('/api/v1/settings/public');
 
-  const authReq = (token && isApiRequest) ? req.clone({ setHeaders: { Authorization: `Bearer ${token}` } }) : req;
+  const authReq = (token && isApiRequest && !isSetupRequest && !isPublicSettingsRequest) ? req.clone({ setHeaders: { Authorization: `Bearer ${token}` } }) : req;
 
   return next(authReq).pipe(
     catchError((error: HttpErrorResponse) => {
-      if (error.status === 401) {
+      if (error.status === 401 && !isSetupRequest && !isPublicSettingsRequest) {
         return handle401Error(authService, authReq, next, router, !!internalToken);
       }
       return throwError(() => error);
@@ -31,7 +33,7 @@ export const AuthInterceptorService: HttpInterceptorFn = (req, next: HttpHandler
 let isRefreshing = false;
 const refreshTokenSubject = new BehaviorSubject<string | null>(null);
 
-function handle401Error(authService: AuthService, request: HttpRequest<any>, next: HttpHandlerFn, router: Router, isInternal: boolean): Observable<any> {
+function handle401Error(authService: AuthService, request: HttpRequest<unknown>, next: HttpHandlerFn, router: Router, isInternal: boolean): Observable<HttpEvent<unknown>> {
   if (!isRefreshing && isInternal) {
     isRefreshing = true;
     refreshTokenSubject.next(null);
@@ -39,13 +41,13 @@ function handle401Error(authService: AuthService, request: HttpRequest<any>, nex
     return authService.internalRefreshToken().pipe(
       switchMap(response => {
         isRefreshing = false;
-        const { accessToken, refreshToken } = response;
-        if (accessToken && refreshToken) {
-          authService.saveInternalTokens(accessToken, refreshToken);
-          refreshTokenSubject.next(accessToken);
+        const { access_token, refresh_token } = response.data;
+        if (access_token && refresh_token) {
+          authService.saveInternalTokens(access_token, refresh_token);
+          refreshTokenSubject.next(access_token);
         }
         return next(request.clone({
-          setHeaders: { Authorization: `Bearer ${accessToken}` }
+          setHeaders: { Authorization: `Bearer ${access_token}` }
         }));
       }),
       catchError(err => {

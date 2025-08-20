@@ -1,0 +1,188 @@
+<!-- 支付重试模态框 -->
+<div class="modal-overlay" *ngIf="showModal" (click)="closeModal()" (keydown.escape)="closeModal()" tabindex="0">
+  <div class="modal-container" (click)="$event.stopPropagation()" (keydown)="$event.stopPropagation()" tabindex="0">
+    <div class="modal-header">
+      <h3>支付重试</h3>
+      <button class="close-btn" (click)="closeModal()">
+        <span>&times;</span>
+      </button>
+    </div>
+
+    <div class="modal-body">
+      <!-- 加载状态 -->
+      <div *ngIf="isLoading" class="loading">
+        <div class="spinner"></div>
+        <p>正在加载支付信息...</p>
+      </div>
+
+      <!-- 错误信息 -->
+      <div *ngIf="error && !isLoading" class="error-message">
+        <div class="error-card">
+          <h4>操作失败</h4>
+          <p>{{ error }}</p>
+          <div class="error-actions">
+            <button class="btn-secondary" (click)="loadPaymentIntent()">重新加载</button>
+            <button class="btn-primary" (click)="closeModal()">关闭</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 支付信息 -->
+      <div *ngIf="paymentIntent && !isLoading && !error" class="payment-info">
+        <!-- 支付详情 -->
+        <div class="payment-details">
+          <h4>支付详情</h4>
+          <div class="detail-grid">
+            <div class="detail-item">
+              <span class="label">支付ID:</span>
+              <span class="value">{{ paymentIntent.id }}</span>
+            </div>
+            <div class="detail-item">
+              <span class="label">金额:</span>
+              <span class="value amount">{{ formatCurrency(paymentIntent.amount, paymentIntent.currency) }}</span>
+            </div>
+            <div class="detail-item">
+              <span class="label">状态:</span>
+              <span class="value">
+                <span class="status-badge" [ngClass]="getStatusClass(paymentIntent.status)">
+                  {{ getStatusText(paymentIntent.status) }}
+                </span>
+              </span>
+            </div>
+            <div class="detail-item" *ngIf="paymentIntent.description">
+              <span class="label">描述:</span>
+              <span class="value">{{ paymentIntent.description }}</span>
+            </div>
+            <div class="detail-item">
+              <span class="label">创建时间:</span>
+              <span class="value">{{ formatDate(paymentIntent.createdAt) }}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 错误信息 -->
+        <div *ngIf="paymentIntent.lastPaymentError" class="payment-error">
+          <h4>支付失败原因</h4>
+          <div class="error-details">
+            <div class="error-type">
+              <span class="label">错误类型:</span>
+              <span class="value">{{ getErrorTypeText(paymentIntent.lastPaymentError.type) }}</span>
+            </div>
+            <div class="error-code" *ngIf="paymentIntent.lastPaymentError.code">
+              <span class="label">错误代码:</span>
+              <span class="value">{{ paymentIntent.lastPaymentError.code }}</span>
+            </div>
+            <div class="error-message-detail">
+              <span class="label">错误信息:</span>
+              <span class="value">{{ paymentIntent.lastPaymentError.message }}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 支付方式选择 -->
+        <div *ngIf="canRetry()" class="payment-method-selection">
+          <h4>选择支付方式</h4>
+          <div *ngIf="isLoadingPaymentMethods" class="loading-methods">
+            <div class="spinner-small"></div>
+            <span>正在加载支付方式...</span>
+          </div>
+          
+          <div *ngIf="!isLoadingPaymentMethods && availablePaymentMethods.length > 0" class="payment-methods">
+            <div class="method-item" 
+                 *ngFor="let method of availablePaymentMethods" 
+                 [class.selected]="selectedPaymentMethodId === method.id"
+                 (click)="onPaymentMethodChange(method.id)"
+                 (keydown.enter)="onPaymentMethodChange(method.id)"
+                 (keydown.space)="onPaymentMethodChange(method.id)"
+                 tabindex="0"
+                 role="button"
+                 [attr.aria-pressed]="selectedPaymentMethodId === method.id">
+              <div class="method-info">
+                <div class="method-type">{{ method.type.toUpperCase() }}</div>
+                <div *ngIf="method.card" class="card-info">
+                  <span class="brand">{{ method.card.brand.toUpperCase() }}</span>
+                  <span class="last4">**** {{ method.card.last4 }}</span>
+                  <span class="expiry">{{ method.card.expMonth }}/{{ method.card.expYear }}</span>
+                </div>
+              </div>
+              <div class="method-radio">
+                <input type="radio" 
+                       [checked]="selectedPaymentMethodId === method.id"
+                       (change)="onPaymentMethodChange(method.id)">
+              </div>
+            </div>
+          </div>
+
+          <div *ngIf="!isLoadingPaymentMethods && availablePaymentMethods.length === 0" class="no-methods">
+            <p>暂无可用的支付方式，请先添加支付方式。</p>
+            <button class="btn-link" (click)="closeModal()">前往添加支付方式</button>
+          </div>
+        </div>
+
+        <!-- 重试信息 -->
+        <div *ngIf="retryAttempts > 0" class="retry-info">
+          <div class="retry-count">
+            <span class="label">重试次数:</span>
+            <span class="value">{{ retryAttempts }} / {{ maxRetryAttempts }}</span>
+          </div>
+          <div class="retry-warning" *ngIf="retryAttempts >= maxRetryAttempts - 1">
+            <span>⚠️ 即将达到最大重试次数</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-footer" *ngIf="paymentIntent && !isLoading && !error">
+      <div class="action-buttons">
+        <!-- 重试支付 -->
+        <button *ngIf="canRetry()" 
+                class="btn-primary" 
+                [disabled]="isRetrying || !selectedPaymentMethodId"
+                (click)="retryPayment()">
+          <span *ngIf="isRetrying" class="spinner-small"></span>
+          {{ isRetrying ? '重试中...' : '重试支付' }}
+        </button>
+
+        <!-- 确认支付 -->
+        <button *ngIf="canConfirm()" 
+                class="btn-success" 
+                [disabled]="isRetrying"
+                (click)="confirmPayment()">
+          <span *ngIf="isRetrying" class="spinner-small"></span>
+          {{ isRetrying ? '确认中...' : '确认支付' }}
+        </button>
+
+        <!-- 取消支付 -->
+        <button *ngIf="canCancel()" 
+                class="btn-danger" 
+                [disabled]="isRetrying"
+                (click)="cancelPayment()">
+          取消支付
+        </button>
+
+        <!-- 关闭 -->
+        <button class="btn-secondary" 
+                [disabled]="isRetrying"
+                (click)="closeModal()">
+          关闭
+        </button>
+      </div>
+
+      <!-- 提示信息 -->
+      <div class="footer-tips">
+        <div *ngIf="paymentIntent.status === 'requires_action'" class="tip-item">
+          <span class="tip-icon">💡</span>
+          <span class="tip-text">此支付可能需要额外的身份验证，请按照银行提示完成验证。</span>
+        </div>
+        <div *ngIf="paymentIntent.status === 'requires_payment_method'" class="tip-item">
+          <span class="tip-icon">💳</span>
+          <span class="tip-text">请选择一个有效的支付方式进行重试。</span>
+        </div>
+        <div *ngIf="retryAttempts > 0" class="tip-item">
+          <span class="tip-icon">🔄</span>
+          <span class="tip-text">如果多次重试失败，建议检查银行卡状态或联系客服。</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

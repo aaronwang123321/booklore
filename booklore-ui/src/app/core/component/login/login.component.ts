@@ -11,6 +11,7 @@ import {AppSettingsService} from '../../service/app-settings.service';
 import {AppSettings} from '../../model/app-settings.model';
 import {Observable} from 'rxjs';
 import {filter, take} from 'rxjs/operators';
+import {UserService} from '../../../settings/user-management/user.service';
 
 @Component({
   selector: 'app-login',
@@ -34,6 +35,7 @@ export class LoginComponent implements OnInit {
   private authService = inject(AuthService);
   private oAuthService = inject(OAuthService);
   private appSettingsService = inject(AppSettingsService);
+  private userService = inject(UserService);
   private router = inject(Router);
 
   appSettings$: Observable<AppSettings | null> = this.appSettingsService.appSettings$;
@@ -53,6 +55,9 @@ export class LoginComponent implements OnInit {
   login(): void {
     this.authService.internalLogin({username: this.username, password: this.password}).subscribe({
       next: (response) => {
+        // 登录成功后加载当前用户信息
+        this.userService.loadCurrentUser();
+        
         if (response.isDefaultPassword === 'true') {
           this.router.navigate(['/change-password']);
         } else {

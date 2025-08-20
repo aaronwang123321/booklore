@@ -1,0 +1,216 @@
+<div class="admin-dashboard">
+  <!-- 页面标题 -->
+  <div class="dashboard-header">
+    <h1>管理员仪表板</h1>
+    <p-button 
+      label="导出数据" 
+      icon="pi pi-download" 
+      severity="secondary"
+      (click)="exportDashboardData()">
+    </p-button>
+  </div>
+
+  <!-- 概览卡片 -->
+  <div class="overview-cards" *ngIf="dashboardData$ | async as data">
+    <p-card class="overview-card">
+      <div class="card-content">
+        <div class="card-icon users">
+          <i class="pi pi-users"></i>
+        </div>
+        <div class="card-info">
+          <h3>{{ data.totalUsers }}</h3>
+          <p>总用户数</p>
+        </div>
+      </div>
+    </p-card>
+
+    <p-card class="overview-card">
+      <div class="card-content">
+        <div class="card-icon books">
+          <i class="pi pi-book"></i>
+        </div>
+        <div class="card-info">
+          <h3>{{ data.totalBooks }}</h3>
+          <p>总书籍数</p>
+        </div>
+      </div>
+    </p-card>
+
+    <p-card class="overview-card">
+      <div class="card-content">
+        <div class="card-icon libraries">
+          <i class="pi pi-home"></i>
+        </div>
+        <div class="card-info">
+          <h3>{{ data.totalLibraries }}</h3>
+          <p>图书馆数</p>
+        </div>
+      </div>
+    </p-card>
+
+    <p-card class="overview-card">
+      <div class="card-content">
+        <div class="card-icon subscriptions">
+          <i class="pi pi-star"></i>
+        </div>
+        <div class="card-info">
+          <h3>{{ data.activeSubscriptions }}</h3>
+          <p>活跃订阅</p>
+        </div>
+      </div>
+    </p-card>
+  </div>
+
+  <!-- 系统健康状态 -->
+  <div class="system-health" *ngIf="dashboardData$ | async as data">
+    <p-card>
+      <ng-template pTemplate="header">
+        <h2>系统健康状态</h2>
+      </ng-template>
+      <div class="health-metrics" *ngIf="data.systemHealth; else healthError">
+        <div class="health-item">
+          <span class="health-label">系统状态:</span>
+          <p-tag 
+            [value]="data.systemHealth.status" 
+            [severity]="data.systemHealth.status === 'healthy' ? 'success' : 'danger'">
+          </p-tag>
+        </div>
+        <div class="health-item">
+          <span class="health-label">系统正常运行时间:</span>
+          <span>{{ data.systemHealth.uptime }}</span>
+        </div>
+        <div class="health-item">
+          <span class="health-label">内存使用率:</span>
+          <p-progressBar [value]="data.systemHealth.memoryUsage" [showValue]="true"></p-progressBar>
+        </div>
+        <div class="health-item">
+          <span class="health-label">磁盘使用率:</span>
+          <p-progressBar [value]="data.systemHealth.diskUsage" [showValue]="true"></p-progressBar>
+        </div>
+      </div>
+      <ng-template #healthError>
+        <div class="error-message">
+          <p>无法加载系统健康状态数据</p>
+        </div>
+      </ng-template>
+    </p-card>
+  </div>
+
+  <!-- 系统警报 -->
+  <div class="system-alerts" *ngIf="systemAlerts$ | async as alerts">
+    <p-card>
+      <ng-template pTemplate="header">
+        <h2>系统警报</h2>
+      </ng-template>
+      <div class="alerts-container" *ngIf="alerts.length > 0; else noAlerts">
+        <div class="alert-item" *ngFor="let alert of alerts">
+          <div class="alert-content">
+            <p-tag 
+              [value]="alert.severity" 
+              [severity]="alert.severity === 'critical' ? 'danger' : alert.severity === 'warning' ? 'warning' : 'info'">
+            </p-tag>
+            <div class="alert-details">
+              <h4>{{ alert.title }}</h4>
+              <p>{{ alert.message }}</p>
+              <small>{{ alert.timestamp | date:'medium' }}</small>
+            </div>
+          </div>
+          <p-button 
+            icon="pi pi-check" 
+            severity="secondary" 
+            size="small"
+            (click)="acknowledgeAlert(alert.id)"
+            pTooltip="确认警报">
+          </p-button>
+        </div>
+      </div>
+      <ng-template #noAlerts>
+        <p class="no-alerts">暂无系统警报</p>
+      </ng-template>
+    </p-card>
+  </div>
+
+  <!-- 图表区域 -->
+  <div class="charts-section">
+    <div class="chart-container">
+      <p-card>
+        <ng-template pTemplate="header">
+          <h3>用户活动趋势</h3>
+        </ng-template>
+        <p-chart 
+          type="line" 
+          [data]="userActivityChartData" 
+          [options]="userActivityChartOptions">
+        </p-chart>
+      </p-card>
+    </div>
+
+    <div class="chart-container">
+      <p-card>
+        <ng-template pTemplate="header">
+          <h3>系统性能监控</h3>
+        </ng-template>
+        <p-chart 
+          type="doughnut" 
+          [data]="systemHealthChartData" 
+          [options]="systemHealthChartOptions">
+        </p-chart>
+      </p-card>
+    </div>
+  </div>
+
+  <!-- 近期活动 -->
+  <div class="recent-activities" *ngIf="dashboardData$ | async as data">
+    <p-card>
+      <ng-template pTemplate="header">
+        <h2>近期活动</h2>
+      </ng-template>
+      <p-table [value]="data.recentActivity" [paginator]="true" [rows]="5">
+        <ng-template pTemplate="header">
+          <tr>
+            <th>时间</th>
+            <th>用户</th>
+            <th>操作</th>
+            <th>详情</th>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-activity>
+          <tr>
+            <td>{{ activity.timestamp | date:'short' }}</td>
+            <td>{{ activity.userName }}</td>
+            <td>{{ activity.action }}</td>
+            <td>{{ activity.details }}</td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </p-card>
+  </div>
+
+  <!-- 快速操作 -->
+  <div class="quick-actions">
+    <p-card>
+      <ng-template pTemplate="header">
+        <h2>快速操作</h2>
+      </ng-template>
+      <div class="action-buttons">
+        <p-button 
+          label="用户管理" 
+          icon="pi pi-users" 
+          (click)="navigateToUserManagement()">
+        </p-button>
+        <p-button 
+          label="系统监控" 
+          icon="pi pi-chart-line" 
+          severity="secondary"
+          (click)="navigateToSystemMonitor()">
+        </p-button>
+        <p-button 
+          label="数据分析" 
+          icon="pi pi-chart-bar" 
+          severity="info"
+          (click)="navigateToAnalytics()">
+        </p-button>
+      </div>
+    </p-card>
+  </div>
+</div>

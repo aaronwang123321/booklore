@@ -1,8 +1,8 @@
 import {Component, inject, OnInit} from '@angular/core';
 import {Router} from '@angular/router';
 import {OAuthService} from 'angular-oauth2-oidc';
-import {AuthService} from '../../service/auth.service';
 import {MessageService} from 'primeng/api';
+import {UserService} from '../../../settings/user-management/user.service';
 
 @Component({
   selector: 'app-oidc-callback',
@@ -13,11 +13,14 @@ export class OidcCallbackComponent implements OnInit {
   private router = inject(Router);
   private oauthService = inject(OAuthService);
   private messageService = inject(MessageService);
+  private userService = inject(UserService);
 
   async ngOnInit(): Promise<void> {
     try {
       await this.oauthService.tryLoginCodeFlow();
       if (this.oauthService.hasValidAccessToken()) {
+        // OIDC登录成功后加载当前用户信息
+        this.userService.loadCurrentUser();
         this.router.navigate(['/dashboard']);
       } else {
         this.router.navigate(['/login']);

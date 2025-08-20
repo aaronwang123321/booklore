@@ -1,0 +1,86 @@
+<div class="subscription-plans-container">
+  <div class="header">
+    <h2>选择订阅计划</h2>
+    <p>选择最适合您需求的订阅计划</p>
+  </div>
+
+  <!-- 当前订阅状态 -->
+  <div class="current-subscription" *ngIf="currentSubscription">
+    <div class="status-card">
+      <h3>当前订阅</h3>
+      <div class="subscription-info">
+        <span class="plan-name">{{ currentSubscription.planName }}</span>
+        <span class="status" [class]="'status-' + currentSubscription.status">{{ getStatusText(currentSubscription.status) }}</span>
+      </div>
+      <div class="billing-info" *ngIf="currentSubscription.nextBillingDate">
+        <span>下次计费日期: {{ currentSubscription.nextBillingDate | date:'yyyy-MM-dd' }}</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 加载状态 -->
+  <div class="loading" *ngIf="loading">
+    <div class="spinner"></div>
+    <p>加载中...</p>
+  </div>
+
+  <!-- 订阅计划列表 -->
+  <div class="plans-grid" *ngIf="!loading">
+    <div 
+      class="plan-card" 
+      *ngFor="let plan of plans" 
+      [class.selected]="selectedPlanId === plan.id"
+      [class.current]="currentSubscription?.planId === plan.id"
+    >
+      <div class="plan-header">
+        <h3>{{ plan.name }}</h3>
+        <div class="price">
+          <span class="amount">${{ plan.price }}</span>
+          <span class="period">/ {{ plan.interval }}</span>
+        </div>
+      </div>
+
+      <div class="plan-description">
+        <p>{{ plan.description }}</p>
+      </div>
+
+      <div class="plan-features">
+        <ul>
+          <li *ngFor="let feature of plan.features">
+            <span class="checkmark">✓</span>
+            {{ feature }}
+          </li>
+        </ul>
+      </div>
+
+      <div class="plan-actions">
+        <button 
+          class="btn-primary"
+          *ngIf="currentSubscription?.planId !== plan.id"
+          [disabled]="processing"
+          (click)="selectPlan(plan)"
+        >
+          <span *ngIf="!processing || selectedPlanId !== plan.id">选择计划</span>
+          <span *ngIf="processing && selectedPlanId === plan.id">处理中...</span>
+        </button>
+        
+        <button 
+          class="btn-secondary"
+          *ngIf="currentSubscription?.planId === plan.id"
+          disabled
+        >
+          当前计划
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 错误信息 -->
+  <div class="error-message" *ngIf="error">
+    <div class="error-card">
+      <h4>出现错误</h4>
+      <p>{{ error }}</p>
+      <button class="btn-secondary" (click)="loadPlans()">重试</button>
+    </div>
+  </div>
+</div>

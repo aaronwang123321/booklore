@@ -1,12 +1,11 @@
 import {inject, Injectable, Injector} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
 import {Observable, tap} from 'rxjs';
-import {RxStompService} from '../../shared/websocket/rx-stomp.service';
+import {SocketIOService} from '../../shared/websocket/socket-io.service';
 import {API_CONFIG} from '../../config/api-config';
-import {createRxStompConfig} from '../../shared/websocket/rx-stomp.config';
 import {OAuthService} from 'angular-oauth2-oidc';
-import {AppSettingsService} from './app-settings.service';
 import {Router} from '@angular/router';
+import {UserService} from '../../settings/user-management/user.service';
 
 @Injectable({
   providedIn: 'root',
@@ -14,41 +13,51 @@ import {Router} from '@angular/router';
 export class AuthService {
 
   private apiUrl = `${API_CONFIG.BASE_URL}/api/v1/auth`;
-  private rxStompService?: RxStompService;
+  private socketIOService?: SocketIOService;
 
   private http = inject(HttpClient);
   private injector = inject(Injector);
   private oAuthService = inject(OAuthService);
   private router = inject(Router);
+  private userService = inject(UserService);
 
-  internalLogin(credentials: { username: string; password: string }): Observable<{ accessToken: string; refreshToken: string, isDefaultPassword: string }> {
-    return this.http.post<{ accessToken: string; refreshToken: string, isDefaultPassword: string }>(`${this.apiUrl}/login`, credentials).pipe(
+  internalLogin(credentials: { username: string; password: string }): Observable<{ data: { access_token: string; refresh_token: string }, isDefaultPassword: string }> {
+    // Map username to email for backend compatibility
+    const loginPayload = {
+      email: credentials.username,
+      password: credentials.password
+    };
+    return this.http.post<{ data: { access_token: string; refresh_token: string }, isDefaultPassword: string }>(`${this.apiUrl}/login`, loginPayload).pipe(
       tap((response) => {
-        if (response.accessToken && response.refreshToken) {
-          this.saveInternalTokens(response.accessToken, response.refreshToken);
+        if (response.data?.access_token && response.data?.refresh_token) {
+          this.saveInternalTokens(response.data.access_token, response.data.refresh_token);
           this.initializeWebSocketConnection();
+          // 登录成功后加载用户信息
+          this.userService.loadCurrentUser();
         }
       })
     );
   }
 
-  internalRefreshToken(): Observable<{ accessToken: string; refreshToken: string }> {
+  internalRefreshToken(): Observable<{ data: { access_token: string; refresh_token: string } }> {
     const refreshToken = this.getInternalRefreshToken();
-    return this.http.post<{ accessToken: string; refreshToken: string }>(`${this.apiUrl}/refresh`, {refreshToken}).pipe(
+    return this.http.post<{ data: { access_token: string; refresh_token: string } }>(`${this.apiUrl}/refresh`, {refreshToken}).pipe(
       tap((response) => {
-        if (response.accessToken && response.refreshToken) {
-          this.saveInternalTokens(response.accessToken, response.refreshToken);
+        if (response.data?.access_token && response.data?.refresh_token) {
+          this.saveInternalTokens(response.data.access_token, response.data.refresh_token);
         }
       })
     );
   }
 
-  remoteLogin(): Observable<{ accessToken: string; refreshToken: string, isDefaultPassword: string }> {
-    return this.http.get<{ accessToken: string; refreshToken: string, isDefaultPassword: string }>(`${this.apiUrl}/remote`).pipe(
+  remoteLogin(): Observable<{ data: { access_token: string; refresh_token: string }, isDefaultPassword: string }> {
+    return this.http.get<{ data: { access_token: string; refresh_token: string }, isDefaultPassword: string }>(`${this.apiUrl}/remote`).pipe(
       tap((response) => {
-        if (response.accessToken && response.refreshToken) {
-          this.saveInternalTokens(response.accessToken, response.refreshToken);
+        if (response.data?.access_token && response.data?.refresh_token) {
+          this.saveInternalTokens(response.data.access_token, response.data.refresh_token);
           this.initializeWebSocketConnection();
+          // 登录成功后加载用户信息
+          this.userService.loadCurrentUser();
         }
       })
     );
@@ -74,7 +83,7 @@ export class AuthService {
   logout(): void {
     localStorage.removeItem('accessToken_Internal');
     localStorage.removeItem('refreshToken_Internal');
-    this.getRxStompService().deactivate();
+    this.getSocketIOService().deactivate();
     if (this.oAuthService.clientId) {
       this.oAuthService.logOut();
     } else {
@@ -82,21 +91,19 @@ export class AuthService {
     }
   }
 
-  getRxStompService(): RxStompService {
-    if (!this.rxStompService) {
-      this.rxStompService = this.injector.get(RxStompService);
+  getSocketIOService(): SocketIOService {
+    if (!this.socketIOService) {
+      this.socketIOService = this.injector.get(SocketIOService);
     }
-    return this.rxStompService;
+    return this.socketIOService;
   }
 
   initializeWebSocketConnection(): void {
     const token = this.getOidcAccessToken() || this.getInternalAccessToken();
     if (!token) return;
 
-    const stompService = this.getRxStompService();
-    const config = createRxStompConfig(this);
-    stompService.updateConfig(config);
-    stompService.activate();
+    const socketService = this.getSocketIOService();
+    socketService.activate();
   }
 }
 

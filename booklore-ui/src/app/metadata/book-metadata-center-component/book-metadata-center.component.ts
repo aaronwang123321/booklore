@@ -10,7 +10,6 @@ import {
   shareReplay,
   switchMap,
   takeUntil,
-  tap,
   take,
 } from 'rxjs/operators';
 import { BookService } from '../../book/service/book.service';
@@ -128,8 +127,8 @@ export class BookMetadataCenterComponent implements OnInit, OnDestroy {
     this.userService.userState$
       .pipe(takeUntil(this.destroy$))
       .subscribe(userData => {
-        this.canEditMetadata = userData?.permissions?.canEditMetadata ?? false;
-        this.admin = userData?.permissions?.admin ?? false;
+        this.canEditMetadata = userData?.role === 'ADMIN';
+        this.admin = userData?.role === 'ADMIN';
       });
   }
 

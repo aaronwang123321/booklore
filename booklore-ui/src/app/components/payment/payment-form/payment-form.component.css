@@ -1,0 +1,271 @@
+/* Payment Form Container */
+.payment-form-container {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 1rem;
+}
+
+/* Payment Amount Display */
+.payment-amount {
+  text-align: center;
+  margin-bottom: 2rem;
+  padding: 1rem;
+  background: var(--surface-50);
+  border-radius: 8px;
+  border: 1px solid var(--surface-200);
+}
+
+.payment-amount h3 {
+  margin: 0 0 0.5rem 0;
+  color: var(--primary-color);
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+.payment-description {
+  margin: 0;
+  color: var(--text-color-secondary);
+  font-size: 0.9rem;
+}
+
+/* Error Message */
+.error-message {
+  margin-bottom: 1rem;
+}
+
+/* Form Sections */
+.payment-form {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.billing-section,
+.card-section {
+  padding: 1rem 0;
+}
+
+.billing-section h4,
+.card-section h4 {
+  margin: 0 0 1rem 0;
+  color: var(--text-color);
+  font-size: 1.1rem;
+  font-weight: 600;
+  border-bottom: 1px solid var(--surface-200);
+  padding-bottom: 0.5rem;
+}
+
+.address-section h5 {
+  margin: 1.5rem 0 1rem 0;
+  color: var(--text-color-secondary);
+  font-size: 1rem;
+  font-weight: 500;
+}
+
+/* Form Layout */
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+.form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.form-field label {
+  font-weight: 500;
+  color: var(--text-color);
+  font-size: 0.9rem;
+}
+
+.form-field input {
+  padding: 0.75rem;
+  border: 1px solid var(--surface-300);
+  border-radius: 6px;
+  font-size: 0.9rem;
+  transition: border-color 0.2s ease;
+}
+
+.form-field input:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 2px var(--primary-color-text);
+}
+
+.form-field input.ng-invalid {
+  border-color: var(--red-500);
+}
+
+.error-text {
+  color: var(--red-500);
+  font-size: 0.8rem;
+  margin-top: 0.25rem;
+}
+
+/* Card Element */
+.card-element-container {
+  margin-top: 1rem;
+}
+
+.card-element-container label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+  color: var(--text-color);
+  font-size: 0.9rem;
+}
+
+.card-element {
+  padding: 0.75rem;
+  border: 1px solid var(--surface-300);
+  border-radius: 6px;
+  background: white;
+  min-height: 40px;
+  display: flex;
+  align-items: center;
+  transition: border-color 0.2s ease;
+}
+
+.card-element:focus-within {
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 2px var(--primary-color-text);
+}
+
+.card-element-loading {
+  background: var(--surface-50);
+}
+
+.card-loading {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--text-color-secondary);
+  font-size: 0.9rem;
+}
+
+.card-element-info {
+  margin-top: 0.5rem;
+}
+
+.info-text {
+  color: var(--text-color-secondary);
+  font-size: 0.8rem;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.info-text i {
+  color: var(--green-500);
+}
+
+/* Submit Section */
+.submit-section {
+  margin-top: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.payment-security {
+  text-align: center;
+}
+
+.security-text {
+  color: var(--text-color-secondary);
+  font-size: 0.8rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.25rem;
+}
+
+.security-text i {
+  color: var(--blue-500);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .payment-form-container {
+    padding: 0.5rem;
+  }
+  
+  .form-row {
+    grid-template-columns: 1fr;
+  }
+  
+  .payment-amount {
+    margin-bottom: 1.5rem;
+    padding: 0.75rem;
+  }
+  
+  .payment-amount h3 {
+    font-size: 1.25rem;
+  }
+  
+  .billing-section,
+  .card-section {
+    padding: 0.75rem 0;
+  }
+}
+
+@media (max-width: 480px) {
+  .form-field input,
+  .card-element {
+    padding: 0.625rem;
+    font-size: 0.85rem;
+  }
+  
+  .payment-amount h3 {
+    font-size: 1.1rem;
+  }
+}
+
+/* Loading States */
+.processing {
+  pointer-events: none;
+  opacity: 0.7;
+}
+
+/* Animation for form transitions */
+.form-field {
+  animation: fadeIn 0.3s ease-in;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Custom Stripe Element Styles */
+.StripeElement {
+  height: 40px;
+  padding: 10px 12px;
+  color: #424770;
+  background-color: white;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  box-shadow: 0 1px 3px 0 #e6ebf1;
+  transition: box-shadow 150ms ease;
+}
+
+.StripeElement--focus {
+  box-shadow: 0 1px 3px 0 #cfd7df;
+}
+
+.StripeElement--invalid {
+  border-color: #fa755a;
+}
+
+.StripeElement--webkit-autofill {
+  background-color: #fefde5 !important;
+}

@@ -37,13 +37,44 @@ export class SetupComponent {
     });
   }
 
+  quickSetup(): void {
+    this.loading = true;
+    this.error = null;
+
+    const quickSetupData = {
+      username: 'admin',
+      email: 'branch.wang@gmail.com',
+      password: 'Bb**800217',
+      displayName: 'Administrator'
+    };
+
+    this.setupService.createAdmin(quickSetupData).subscribe({
+      next: () => {
+        this.success = true;
+        setTimeout(() => this.router.navigate(['/login']), 1500);
+      },
+      error: (err) => {
+        this.loading = false;
+        this.error =
+          err?.error?.message || 'Failed to create admin user. Try again.';
+      },
+    });
+  }
+
   onSubmit(): void {
     if (this.setupForm.invalid) return;
 
     this.loading = true;
     this.error = null;
 
-    this.setupService.createAdmin(this.setupForm.value).subscribe({
+    const formData = {
+      username: this.setupForm.value.username,
+      email: this.setupForm.value.email,
+      password: this.setupForm.value.password,
+      displayName: this.setupForm.value.name
+    };
+
+    this.setupService.createAdmin(formData).subscribe({
       next: () => {
         this.success = true;
         setTimeout(() => this.router.navigate(['/login']), 1500);

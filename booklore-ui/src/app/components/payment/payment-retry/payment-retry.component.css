@@ -1,0 +1,586 @@
+/* 模态框样式 */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  backdrop-filter: blur(2px);
+}
+
+.modal-container {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+  max-width: 600px;
+  width: 90%;
+  max-height: 90vh;
+  overflow-y: auto;
+  animation: modalSlideIn 0.3s ease-out;
+}
+
+@keyframes modalSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* 模态框头部 */
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 24px;
+  border-bottom: 1px solid #e9ecef;
+  background: #f8f9fa;
+  border-radius: 12px 12px 0 0;
+}
+
+.modal-header h3 {
+  margin: 0;
+  font-size: 1.4rem;
+  font-weight: 600;
+  color: #333;
+}
+
+.close-btn {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  color: #6c757d;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+}
+
+.close-btn:hover {
+  background: #e9ecef;
+  color: #333;
+}
+
+/* 模态框主体 */
+.modal-body {
+  padding: 24px;
+}
+
+/* 加载状态 */
+.loading {
+  text-align: center;
+  padding: 40px;
+}
+
+.spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid #f3f3f3;
+  border-top: 4px solid #007bff;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin: 0 auto 20px;
+}
+
+.spinner-small {
+  width: 16px;
+  height: 16px;
+  border: 2px solid #f3f3f3;
+  border-top: 2px solid #007bff;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  display: inline-block;
+  margin-right: 8px;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* 错误信息 */
+.error-message {
+  margin-bottom: 20px;
+}
+
+.error-card {
+  background: #f8d7da;
+  border: 1px solid #f5c6cb;
+  border-radius: 8px;
+  padding: 20px;
+  text-align: center;
+}
+
+.error-card h4 {
+  color: #721c24;
+  margin: 0 0 10px 0;
+  font-size: 1.2rem;
+}
+
+.error-card p {
+  color: #721c24;
+  margin: 0 0 20px 0;
+}
+
+.error-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+}
+
+/* 支付信息 */
+.payment-info {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.payment-details h4,
+.payment-error h4,
+.payment-method-selection h4 {
+  margin: 0 0 16px 0;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #333;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #e9ecef;
+}
+
+/* 详情网格 */
+.detail-grid {
+  display: grid;
+  gap: 12px;
+}
+
+.detail-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 0;
+}
+
+.detail-item .label {
+  font-weight: 600;
+  color: #495057;
+  min-width: 80px;
+}
+
+.detail-item .value {
+  color: #333;
+  font-weight: 500;
+  text-align: right;
+}
+
+.detail-item .value.amount {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #007bff;
+}
+
+/* 状态徽章 */
+.status-badge {
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.status-success {
+  background: #d4edda;
+  color: #155724;
+}
+
+.status-warning {
+  background: #fff3cd;
+  color: #856404;
+}
+
+.status-danger {
+  background: #f8d7da;
+  color: #721c24;
+}
+
+.status-info {
+  background: #d1ecf1;
+  color: #0c5460;
+}
+
+.status-default {
+  background: #f8f9fa;
+  color: #6c757d;
+}
+
+/* 支付错误详情 */
+.payment-error {
+  background: #fff3cd;
+  border: 1px solid #ffeaa7;
+  border-radius: 8px;
+  padding: 16px;
+}
+
+.error-details {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.error-type,
+.error-code,
+.error-message-detail {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.error-type .label,
+.error-code .label,
+.error-message-detail .label {
+  font-weight: 600;
+  color: #856404;
+  min-width: 80px;
+}
+
+.error-type .value,
+.error-code .value,
+.error-message-detail .value {
+  color: #856404;
+  text-align: right;
+  flex: 1;
+  margin-left: 16px;
+}
+
+/* 支付方式选择 */
+.loading-methods {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  color: #6c757d;
+}
+
+.payment-methods {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.method-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px;
+  border: 2px solid #e9ecef;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  background: white;
+}
+
+.method-item:hover {
+  border-color: #007bff;
+  background: #f8f9fa;
+}
+
+.method-item.selected {
+  border-color: #007bff;
+  background: #e7f3ff;
+  box-shadow: 0 2px 8px rgba(0, 123, 255, 0.15);
+}
+
+.method-item:focus {
+  outline: none;
+  border-color: #007bff;
+  box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25);
+}
+
+.method-info {
+  flex: 1;
+}
+
+.method-type {
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 4px;
+}
+
+.card-info {
+  display: flex;
+  gap: 12px;
+  color: #6c757d;
+  font-size: 0.9rem;
+}
+
+.brand {
+  font-weight: 600;
+  color: #007bff;
+}
+
+.last4 {
+  font-family: monospace;
+}
+
+.expiry {
+  color: #6c757d;
+}
+
+.method-radio input[type="radio"] {
+  width: 18px;
+  height: 18px;
+  accent-color: #007bff;
+}
+
+/* 无支付方式 */
+.no-methods {
+  text-align: center;
+  padding: 30px;
+  color: #6c757d;
+}
+
+.no-methods p {
+  margin: 0 0 16px 0;
+}
+
+/* 重试信息 */
+.retry-info {
+  background: #f8f9fa;
+  border: 1px solid #e9ecef;
+  border-radius: 8px;
+  padding: 16px;
+}
+
+.retry-count {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.retry-count .label {
+  font-weight: 600;
+  color: #495057;
+}
+
+.retry-count .value {
+  color: #007bff;
+  font-weight: 600;
+}
+
+.retry-warning {
+  color: #856404;
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* 模态框底部 */
+.modal-footer {
+  padding: 20px 24px;
+  border-top: 1px solid #e9ecef;
+  background: #f8f9fa;
+  border-radius: 0 0 12px 12px;
+}
+
+.action-buttons {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+  margin-bottom: 16px;
+}
+
+/* 按钮样式 */
+.btn-primary,
+.btn-secondary,
+.btn-success,
+.btn-danger,
+.btn-link {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 100px;
+}
+
+.btn-primary {
+  background: #007bff;
+  color: white;
+}
+
+.btn-primary:hover:not(:disabled) {
+  background: #0056b3;
+  transform: translateY(-1px);
+}
+
+.btn-secondary {
+  background: #6c757d;
+  color: white;
+}
+
+.btn-secondary:hover:not(:disabled) {
+  background: #545b62;
+  transform: translateY(-1px);
+}
+
+.btn-success {
+  background: #28a745;
+  color: white;
+}
+
+.btn-success:hover:not(:disabled) {
+  background: #1e7e34;
+  transform: translateY(-1px);
+}
+
+.btn-danger {
+  background: #dc3545;
+  color: white;
+}
+
+.btn-danger:hover:not(:disabled) {
+  background: #c82333;
+  transform: translateY(-1px);
+}
+
+.btn-link {
+  background: transparent;
+  color: #007bff;
+  border: 1px solid #007bff;
+  min-width: auto;
+}
+
+.btn-link:hover:not(:disabled) {
+  background: #007bff;
+  color: white;
+}
+
+button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none !important;
+}
+
+/* 底部提示 */
+.footer-tips {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.tip-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 8px 12px;
+  background: #e7f3ff;
+  border: 1px solid #b8daff;
+  border-radius: 6px;
+  font-size: 0.9rem;
+}
+
+.tip-icon {
+  font-size: 1rem;
+  flex-shrink: 0;
+}
+
+.tip-text {
+  color: #004085;
+  line-height: 1.4;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .modal-container {
+    width: 95%;
+    margin: 20px;
+  }
+  
+  .modal-header,
+  .modal-body,
+  .modal-footer {
+    padding: 16px;
+  }
+  
+  .detail-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+  }
+  
+  .detail-item .value {
+    text-align: left;
+  }
+  
+  .error-type,
+  .error-code,
+  .error-message-detail {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+  }
+  
+  .error-type .value,
+  .error-code .value,
+  .error-message-detail .value {
+    text-align: left;
+    margin-left: 0;
+  }
+  
+  .action-buttons {
+    flex-direction: column;
+  }
+  
+  .action-buttons button {
+    width: 100%;
+  }
+  
+  .card-info {
+    flex-direction: column;
+    gap: 4px;
+  }
+}
+
+@media (max-width: 480px) {
+  .modal-container {
+    width: 100%;
+    height: 100%;
+    border-radius: 0;
+    max-height: 100vh;
+  }
+  
+  .modal-header {
+    border-radius: 0;
+  }
+  
+  .modal-footer {
+    border-radius: 0;
+  }
+  
+  .payment-methods {
+    gap: 8px;
+  }
+  
+  .method-item {
+    padding: 12px;
+  }
+  
+  .tip-item {
+    padding: 6px 10px;
+  }
+}

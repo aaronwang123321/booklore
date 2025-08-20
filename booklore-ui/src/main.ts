@@ -1,8 +1,7 @@
 import {provideHttpClient, withInterceptors} from '@angular/common/http';
 import {DialogService} from 'primeng/dynamicdialog';
 import {ConfirmationService, MessageService} from 'primeng/api';
-import {RxStompService} from './app/shared/websocket/rx-stomp.service';
-import {rxStompServiceFactory} from './app/shared/websocket/rx-stomp-service-factory';
+import {SocketIOService} from './app/shared/websocket/socket-io.service';
 import {provideRouter, RouteReuseStrategy} from '@angular/router';
 import {CustomReuseStrategy} from './app/custom-reuse-strategy';
 import {provideAnimationsAsync} from '@angular/platform-browser/animations/async';
@@ -32,11 +31,7 @@ bootstrapApplication(AppComponent, {
     DialogService,
     MessageService,
     ConfirmationService,
-    {
-      provide: RxStompService,
-      useFactory: rxStompServiceFactory,
-      deps: [AuthService],
-    },
+    SocketIOService,
     {
       provide: RouteReuseStrategy,
       useClass: CustomReuseStrategy

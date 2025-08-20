@@ -1,0 +1,195 @@
+config:
+  target: 'http://localhost:3000'
+  phases:
+    # Warm-up phase
+    - duration: 60
+      arrivalRate: 10
+      name: "Warm-up"
+    
+    # Gradual ramp-up to 1500 concurrent users
+    - duration: 120
+      arrivalRate: 50
+      rampTo: 100
+      name: "Ramp-up to 100"
+    
+    - duration: 120
+      arrivalRate: 100
+      rampTo: 250
+      name: "Ramp-up to 250"
+    
+    - duration: 120
+      arrivalRate: 250
+      rampTo: 500
+      name: "Ramp-up to 500"
+    
+    - duration: 120
+      arrivalRate: 500
+      rampTo: 750
+      name: "Ramp-up to 750"
+    
+    - duration: 120
+      arrivalRate: 750
+      rampTo: 1000
+      name: "Ramp-up to 1000"
+    
+    - duration: 120
+      arrivalRate: 1000
+      rampTo: 1500
+      name: "Ramp-up to 1500"
+    
+    # Sustain 1500 concurrent users
+    - duration: 600
+      arrivalRate: 1500
+      name: "Sustain 1500 users"
+    
+    # Ramp down
+    - duration: 120
+      arrivalRate: 1500
+      rampTo: 100
+      name: "Ramp-down"
+
+  # Performance requirements
+  ensure:
+    p99: 200  # 99th percentile must be under 200ms
+    p95: 150  # 95th percentile must be under 150ms
+    maxErrorRate: 1  # Error rate must be under 1%
+
+  # Load testing configuration
+  http:
+    timeout: 10
+    pool: 50  # Connection pool size
+  
+  # Metrics and reporting
+  plugins:
+    metrics-by-endpoint:
+      useOnlyRequestNames: true
+    
+  processor: "./artillery-processor.js"
+
+scenarios:
+  - name: "Health Check Flow"
+    weight: 20
+    flow:
+      - get:
+          url: "/health"
+          name: "health_check"
+          expect:
+            - statusCode: 200
+            - hasProperty: "status"
+          capture:
+            - header: "x-response-time"
+              as: "response_time"
+
+  - name: "Authentication Flow"
+    weight: 15
+    flow:
+      - post:
+          url: "/api/v1/auth/register"
+          name: "register"
+          json:
+            email: "test-{{ $randomString() }}@example.com"
+            password: "testpassword123"
+            name: "Performance Test User"
+          capture:
+            - json: "$.access_token"
+              as: "auth_token"
+      
+      - get:
+          url: "/api/v1/auth/profile"
+          name: "get_profile"
+          headers:
+            Authorization: "Bearer {{ auth_token }}"
+          expect:
+            - statusCode: 200
+
+  - name: "Library Operations"
+    weight: 25
+    flow:
+      - post:
+          url: "/api/v1/auth/login"
+          name: "login"
+          json:
+            email: "admin@booklore.com"
+            password: "admin123"
+          capture:
+            - json: "$.access_token"
+              as: "auth_token"
+      
+      - get:
+          url: "/api/v1/libraries"
+          name: "list_libraries"
+          headers:
+            Authorization: "Bearer {{ auth_token }}"
+          expect:
+            - statusCode: 200
+          capture:
+            - json: "$[0].id"
+              as: "library_id"
+      
+      - post:
+          url: "/api/v1/libraries"
+          name: "create_library"
+          headers:
+            Authorization: "Bearer {{ auth_token }}"
+          json:
+            name: "Test Library {{ $randomString() }}"
+            description: "Performance test library"
+            isPublic: false
+          expect:
+            - statusCode: 201
+
+  - name: "Book Operations"
+    weight: 30
+    flow:
+      - post:
+          url: "/api/v1/auth/login"
+          name: "login"
+          json:
+            email: "admin@booklore.com"
+            password: "admin123"
+          capture:
+            - json: "$.access_token"
+              as: "auth_token"
+      
+      - get:
+          url: "/api/v1/books?limit=20&page=1"
+          name: "list_books"
+          headers:
+            Authorization: "Bearer {{ auth_token }}"
+          expect:
+            - statusCode: 200
+      
+      - get:
+          url: "/api/v1/books/search?q=fiction"
+          name: "search_books"
+          headers:
+            Authorization: "Bearer {{ auth_token }}"
+          expect:
+            - statusCode: 200
+      
+      - get:
+          url: "/api/v1/books/1"
+          name: "get_book_details"
+          headers:
+            Authorization: "Bearer {{ auth_token }}"
+          expect:
+            - statusCode: [200, 404]  # 404 is acceptable if book doesn't exist
+
+  - name: "Monitoring and Metrics"
+    weight: 10
+    flow:
+      - get:
+          url: "/metrics"
+          name: "prometheus_metrics"
+          expect:
+            - statusCode: [200, 404]  # 404 acceptable if not exposed
+      
+      - get:
+          url: "/health/detailed"
+          name: "detailed_health"
+          expect:
+            - statusCode: [200, 404]
+
+# Custom think time to simulate real user behavior
+defaults:
+  think: 1  # 1 second think time between requests

@@ -6,13 +6,20 @@ import {CreateUserDialogComponent} from './create-user-dialog/create-user-dialog
 import {TableModule} from 'primeng/table';
 import { LowerCasePipe, NgStyle, TitleCasePipe } from '@angular/common';
 import {User, UserService} from './user.service';
+
+interface EditableUser extends User {
+  isEditing?: boolean;
+  selectedLibraryIds: number[];
+  libraryNames: string;
+}
 import {MessageService} from 'primeng/api';
-import {Checkbox} from 'primeng/checkbox';
+
 import {MultiSelect} from 'primeng/multiselect';
 import {Library} from '../../book/model/library.model';
 import {LibraryService} from '../../book/service/library.service';
 import {Dialog} from 'primeng/dialog';
 import {Password} from 'primeng/password';
+import {DropdownModule} from 'primeng/dropdown';
 import {filter, take} from 'rxjs/operators';
 
 @Component({
@@ -21,14 +28,15 @@ import {filter, take} from 'rxjs/operators';
     FormsModule,
     Button,
     TableModule,
-    Checkbox,
+
     NgStyle,
     MultiSelect,
     Dialog,
     Password,
+    DropdownModule,
     LowerCasePipe,
     TitleCasePipe
-],
+  ],
   templateUrl: './user-management.component.html',
   styleUrls: ['./user-management.component.scss'],
 })
@@ -39,7 +47,7 @@ export class UserManagementComponent implements OnInit {
   private libraryService = inject(LibraryService);
   private messageService = inject(MessageService);
 
-  users: User[] = [];
+  users: EditableUser[] = [];
   currentUser: User | undefined;
   editingLibraryIds: number[] = [];
   allLibraries: Library[] = [];
@@ -49,6 +57,11 @@ export class UserManagementComponent implements OnInit {
   newPassword = '';
   confirmNewPassword = '';
   passwordError = '';
+
+  roleOptions = [
+    { label: 'Admin', value: 'ADMIN' },
+    { label: 'User', value: 'USER' }
+  ];
 
   ngOnInit() {
     this.loadUsers();
@@ -69,7 +82,7 @@ export class UserManagementComponent implements OnInit {
         this.users = data.map((user) => ({
           ...user,
           isEditing: false,
-          selectedLibraryIds: user.assignedLibraries?.map((lib) => lib.id) || [],
+          selectedLibraryIds: user.assignedLibraries?.map((lib) => lib.id).filter((id): id is number => id !== undefined) ?? [],
           libraryNames:
             user.assignedLibraries?.map((lib) => lib.name).join(', ') || '',
         }));
@@ -98,10 +111,10 @@ export class UserManagementComponent implements OnInit {
     });
   }
 
-  toggleEdit(user: any) {
+  toggleEdit(user: EditableUser) {
     user.isEditing = !user.isEditing;
     if (user.isEditing) {
-      this.editingLibraryIds = [...user.selectedLibraryIds];
+      this.editingLibraryIds = [...(user.selectedLibraryIds ?? [])];
     } else {
       user.libraryNames =
         user.assignedLibraries
@@ -110,14 +123,14 @@ export class UserManagementComponent implements OnInit {
     }
   }
 
-  saveUser(user: any) {
+  saveUser(user: EditableUser) {
     user.selectedLibraryIds = [...this.editingLibraryIds];
     this.userService
       .updateUser(user.id, {
         name: user.name,
         email: user.email,
-        permissions: user.permissions,
-        assignedLibraries: user.selectedLibraryIds,
+        role: user.role,
+        assignedLibraries: this.allLibraries.filter(lib => lib.id !== undefined && user.selectedLibraryIds.includes(lib.id)),
       })
       .subscribe({
         next: () => {

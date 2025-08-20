@@ -2,9 +2,9 @@ import {inject, Injectable, Injector} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
 import {BehaviorSubject, Observable, throwError} from 'rxjs';
 import {API_CONFIG} from '../../config/api-config';
-import {RxStompService} from '../../shared/websocket/rx-stomp.service';
+import {SocketIOService} from '../../shared/websocket/socket-io.service';
 import {Library} from '../../book/model/library.model';
-import {catchError} from 'rxjs/operators';
+import {catchError, map} from 'rxjs/operators';
 import {CbxPageSpread, CbxPageViewMode, PdfPageSpread, PdfPageViewMode} from '../../book/model/book.model';
 
 export interface EntityViewPreferences {
@@ -95,16 +95,8 @@ export interface User {
   username: string;
   name: string;
   email: string;
+  role: 'ADMIN' | 'USER';
   assignedLibraries: Library[];
-  permissions: {
-    admin: boolean;
-    canUpload: boolean;
-    canDownload: boolean;
-    canEmailBook: boolean;
-    canDeleteBook: boolean;
-    canEditMetadata: boolean;
-    canManipulateLibrary: boolean;
-  };
   userSettings: UserSettings;
   provisioningMethod?: 'LOCAL' | 'OIDC' | 'REMOTE';
 }
@@ -119,24 +111,74 @@ export class UserService {
   private http = inject(HttpClient);
   private injector = inject(Injector);
 
-  private rxStompService?: RxStompService;
+  private socketIOService?: SocketIOService;
 
   private userStateSubject = new BehaviorSubject<User | null>(null);
   userState$ = this.userStateSubject.asObservable();
 
   constructor() {
-    this.getMyself().subscribe(user => {
-      this.userStateSubject.next(user);
-      this.startWebSocket();
-    });
+    // 不在构造函数中自动调用 getMyself()，避免在用户未认证时产生 401 错误
+    // 改为在用户登录后由 AuthService 或其他组件主动调用 loadCurrentUser()
   }
 
   getCurrentUser(): User | null {
     return this.userStateSubject.getValue();
   }
 
+  /**
+   * 手动加载当前用户信息，应在用户认证后调用
+   */
+  loadCurrentUser(): void {
+    this.getMyself().subscribe({
+      next: user => {
+        this.userStateSubject.next(user);
+        this.startWebSocket();
+      },
+      error: err => {
+        console.warn('Failed to load current user:', err);
+        this.userStateSubject.next(null);
+      }
+    });
+  }
+
   getMyself(): Observable<User> {
-    return this.http.get<User>(`${this.userUrl}/me`);
+    interface AuthProfileResponse {
+      success: boolean;
+      data: {
+        id: number;
+        email: string;
+        name: string;
+        role: 'ADMIN' | 'USER';
+        isActive: boolean;
+        emailVerified: boolean;
+        avatar?: string;
+        stripeCustomerId?: string;
+        createdAt: string;
+        updatedAt: string;
+      };
+    }
+
+    return this.http.get<AuthProfileResponse>(`${API_CONFIG.BASE_URL}/api/v1/auth/profile`).pipe(
+      catchError(error => {
+        console.error('Failed to get user profile:', error);
+        return throwError(() => error);
+      }),
+      // 转换API响应格式到User接口
+      map((response: AuthProfileResponse) => {
+        if (response.success && response.data) {
+          return {
+            id: response.data.id,
+            username: response.data.email, // 使用email作为username
+            name: response.data.name,
+            email: response.data.email,
+            role: response.data.role,
+            assignedLibraries: [], // 默认空数组，可能需要从其他API获取
+            userSettings: {} as UserSettings // 默认空对象，可能需要从其他API获取
+          } as User;
+        }
+        throw new Error('Invalid response format');
+      })
+    );
   }
 
   createUser(userData: Omit<User, 'id'>): Observable<void> {
@@ -181,7 +223,7 @@ export class UserService {
     );
   }
 
-  updateUserSetting(userId: number, key: string, value: any): void {
+  updateUserSetting(userId: number, key: string, value: unknown): void {
     const payload = {
       key,
       value
@@ -202,16 +244,16 @@ export class UserService {
   private startWebSocket(): void {
     const token = this.getToken();
     if (token) {
-      const rxStompService = this.getRxStompService();
-      rxStompService.activate();
+      const socketIOService = this.getSocketIOService();
+      socketIOService.activate();
     }
   }
 
-  private getRxStompService(): RxStompService {
-    if (!this.rxStompService) {
-      this.rxStompService = this.injector.get(RxStompService);
+  private getSocketIOService(): SocketIOService {
+    if (!this.socketIOService) {
+      this.socketIOService = this.injector.get(SocketIOService);
     }
-    return this.rxStompService;
+    return this.socketIOService;
   }
 
   getToken(): string | null {

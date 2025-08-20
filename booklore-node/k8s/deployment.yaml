@@ -1,0 +1,153 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: booklore-app
+  namespace: booklore
+  labels:
+    app: booklore-app
+    version: v1
+spec:
+  replicas: 3
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  selector:
+    matchLabels:
+      app: booklore-app
+  template:
+    metadata:
+      labels:
+        app: booklore-app
+        version: v1
+    spec:
+      containers:
+      - name: booklore-app
+        image: ghcr.io/booklore/booklore-node:latest
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 3000
+          name: http
+        env:
+        - name: NODE_ENV
+          valueFrom:
+            configMapKeyRef:
+              name: booklore-config
+              key: NODE_ENV
+        - name: PORT
+          valueFrom:
+            configMapKeyRef:
+              name: booklore-config
+              key: PORT
+        - name: LOG_LEVEL
+          valueFrom:
+            configMapKeyRef:
+              name: booklore-config
+              key: LOG_LEVEL
+        - name: CORS_ORIGIN
+          valueFrom:
+            configMapKeyRef:
+              name: booklore-config
+              key: CORS_ORIGIN
+        - name: JWT_EXPIRES_IN
+          valueFrom:
+            configMapKeyRef:
+              name: booklore-config
+              key: JWT_EXPIRES_IN
+        - name: MAX_FILE_SIZE
+          valueFrom:
+            configMapKeyRef:
+              name: booklore-config
+              key: MAX_FILE_SIZE
+        - name: FILE_STORAGE_PATH
+          valueFrom:
+            configMapKeyRef:
+              name: booklore-config
+              key: FILE_STORAGE_PATH
+        - name: REDIS_URL
+          valueFrom:
+            configMapKeyRef:
+              name: booklore-config
+              key: REDIS_URL
+        - name: DATABASE_URL
+          valueFrom:
+            secretKeyRef:
+              name: booklore-secrets
+              key: DATABASE_URL
+        - name: JWT_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: booklore-secrets
+              key: JWT_SECRET
+        - name: STRIPE_SECRET_KEY
+          valueFrom:
+            secretKeyRef:
+              name: booklore-secrets
+              key: STRIPE_SECRET_KEY
+        - name: STRIPE_WEBHOOK_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: booklore-secrets
+              key: STRIPE_WEBHOOK_SECRET
+        - name: SMTP_HOST
+          valueFrom:
+            secretKeyRef:
+              name: booklore-secrets
+              key: SMTP_HOST
+        - name: SMTP_PORT
+          valueFrom:
+            secretKeyRef:
+              name: booklore-secrets
+              key: SMTP_PORT
+        - name: SMTP_USER
+          valueFrom:
+            secretKeyRef:
+              name: booklore-secrets
+              key: SMTP_USER
+        - name: SMTP_PASS
+          valueFrom:
+            secretKeyRef:
+              name: booklore-secrets
+              key: SMTP_PASS
+        resources:
+          requests:
+            memory: "512Mi"
+            cpu: "500m"
+          limits:
+            memory: "1Gi"
+            cpu: "1000m"
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 3000
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 3000
+          initialDelaySeconds: 5
+          periodSeconds: 5
+          timeoutSeconds: 3
+          failureThreshold: 3
+        volumeMounts:
+        - name: storage-volume
+          mountPath: /app/storage
+        - name: uploads-volume
+          mountPath: /app/uploads
+        - name: logs-volume
+          mountPath: /app/logs
+      volumes:
+      - name: storage-volume
+        persistentVolumeClaim:
+          claimName: booklore-storage-pvc
+      - name: uploads-volume
+        persistentVolumeClaim:
+          claimName: booklore-uploads-pvc
+      - name: logs-volume
+        emptyDir: {}
+      imagePullSecrets:
+      - name: ghcr-secret

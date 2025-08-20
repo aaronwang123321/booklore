@@ -22,7 +22,7 @@
 
           @if (userService.userState$ | async; as userData) {
             @if (entityType !== EntityType.ALL_BOOKS && entityType !== EntityType.UNSHELVED &&
-            (userData.permissions.admin || userData.permissions.canManipulateLibrary)) {
+            userData.role === 'ADMIN') {
               <div class="ml-2 flex-shrink-0">
                 <p-button
                   icon="pi pi-ellipsis-v"
@@ -40,7 +40,7 @@
       <div class="flex flex-wrap items-center gap-4 flex-shrink-0">
         <div class="flex flex-wrap items-center gap-4 md:gap-6">
           @if (isFilterActive) {
-            <a class="topbar-items topbar-item" (click)="clearFilter()">
+            <a class="topbar-items topbar-item" tabindex="0" role="button" (click)="clearFilter()" (keydown.enter)="clearFilter()" (keydown.space)="clearFilter()">
               <i
                 class="pi pi-filter-slash"
                 pTooltip="Clear applied filters"
@@ -51,7 +51,7 @@
 
           @if (currentViewMode === 'table') {
             <div>
-              <a class="topbar-items topbar-item" (click)="columnPopover.toggle($event)">
+              <a class="topbar-items topbar-item" tabindex="0" role="button" (click)="columnPopover.toggle($event)" (keydown.enter)="columnPopover.toggle($event)" (keydown.space)="columnPopover.toggle($event)">
                 <i
                   class="pi pi-eye"
                   pTooltip="Visible columns"
@@ -87,7 +87,11 @@
           <div>
             <a
               class="topbar-items topbar-item"
+              tabindex="0"
+              role="button"
               (click)="seriesCollapseOverlay.toggle($event)"
+              (keydown.enter)="seriesCollapseOverlay.toggle($event)"
+              (keydown.space)="seriesCollapseOverlay.toggle($event)"
               pTooltip="Display settings"
               tooltipPosition="top">
               <i class="pi pi-cog"></i>
@@ -104,6 +108,7 @@
                   </p-checkbox>
                 </div>
                 <div class="flex flex-col gap-2">
+                  <!-- eslint-disable-next-line @angular-eslint/template/label-has-associated-control -->
                   <label class="font-medium text-sm">Grid item size</label>
                   <p-slider
                     [(ngModel)]="coverScalePreferenceService.scaleFactor"
@@ -118,6 +123,7 @@
                   </div>
                 </div>
                 <div class="flex flex-col gap-2">
+                  // eslint-disable-next-line @angular-eslint/template/label-has-associated-control
                   <label class="font-medium text-sm">Sidebar Filter Sort:</label>
                   <div class="flex gap-4 justify-start">
                     <p-select
@@ -133,7 +139,7 @@
           </div>
 
           <div>
-            <a class="topbar-items topbar-item" (click)="sortMenu.toggle($event)">
+            <a class="topbar-items topbar-item" tabindex="0" role="button" (click)="sortMenu.toggle($event)" (keydown.enter)="sortMenu.toggle($event)" (keydown.space)="sortMenu.toggle($event)">
               <i
                 class="pi pi-sort"
                 pTooltip="Select sorting"
@@ -142,7 +148,7 @@
             </a>
             <p-menu #sortMenu [popup]="true" [model]="this.bookSorter.sortOptions" appendTo="body">
               <ng-template pTemplate="item" let-item>
-                <div class="flex justify-between items-center px-4 py-2 cursor-pointer" (click)="this.bookSorter.sortBooks(item.field)">
+                <div class="flex justify-between items-center px-4 py-2 cursor-pointer" tabindex="0" role="button" (click)="this.bookSorter.sortBooks(item.field)" (keydown.enter)="this.bookSorter.sortBooks(item.field)" (keydown.space)="this.bookSorter.sortBooks(item.field)">
                   <span>{{ item.label }}</span>
                   @if (item.icon) {
                     <i [class]="item.icon"></i>
@@ -152,7 +158,7 @@
             </p-menu>
           </div>
 
-          <a class="topbar-items topbar-item" (click)="toggleTableGrid()">
+          <a class="topbar-items topbar-item" tabindex="0" role="button" (click)="toggleTableGrid()" (keydown.enter)="toggleTableGrid()" (keydown.space)="toggleTableGrid()">
             <i
               [ngClass]="viewIcon"
               pTooltip="Toggle between Grid and Table view"
@@ -167,6 +173,8 @@
             type="button"
             class="topbar-items topbar-item"
             (click)="searchDropdown.toggle($event)"
+            (keydown.enter)="searchDropdown.toggle($event)"
+            (keydown.space)="searchDropdown.toggle($event)"
             pTooltip="Search"
             tooltipPosition="top"
           >
@@ -190,6 +198,8 @@
                 [rounded]="true"
                 class="absolute right-2 top-1/2 -translate-y-1/2"
                 (click)="clearSearch(); searchDropdown.hide()"
+                (keydown.enter)="clearSearch(); searchDropdown.hide()"
+                (keydown.space)="clearSearch(); searchDropdown.hide()"
               ></p-button>
             </div>
           </p-overlayPanel>
@@ -213,6 +223,8 @@
               [rounded]="true"
               class="absolute right-2 top-1/2 -translate-y-1/2"
               (click)="clearSearch()"
+              (keydown.enter)="clearSearch()"
+              (keydown.space)="clearSearch()"
             ></p-button>
           }
         </div>
@@ -223,6 +235,8 @@
           [outlined]="true"
           [rounded]="true"
           (click)="toggleFilterSidebar()"
+          (keydown.enter)="toggleFilterSidebar()"
+          (keydown.space)="toggleFilterSidebar()"
           pTooltip="Toggle filter sidebar"
           tooltipPosition="top"
         />
@@ -292,10 +306,10 @@
                   <div class="flex">
                     @if (entityType$ | async; as entityType) {
                       <div class="flex gap-2 md:gap-6 pr-2">
-                        @if (userData.permissions.canEditMetadata) {
-                          <p-menu #menu [model]="metadataMenuItems" [popup]="true" appendTo="body" class="hidden"/>
+                        @if (userData.role === 'ADMIN') {
+                          <p-menu #metadataMenu [model]="metadataMenuItems" [popup]="true" appendTo="body" class="hidden"/>
                           <p-button
-                            (click)="menu.toggle($event)"
+                            (click)="metadataMenu.toggle($event)"
                             pTooltip="Metadata actions"
                             tooltipPosition="top"
                             outlined="true"
@@ -323,7 +337,7 @@
                             tooltipPosition="top">
                           </p-button>
                         }
-                        @if (userData.permissions.canEditMetadata) {
+                        @if (userData.role === 'ADMIN') {
                           <p-button
                             outlined="true"
                             icon="pi pi-lock"
@@ -343,14 +357,14 @@
                         }
                         <div class="card flex justify-center">
                           <p-button
-                            (click)="menu.toggle($event)"
+                            (click)="moreActionsMenu.toggle($event)"
                             pTooltip="More actions"
                             tooltipPosition="top"
                             outlined="true"
                             severity="info"
                             icon="pi pi-ellipsis-v">
                           </p-button>
-                          <p-tieredMenu #menu [model]="tieredMenuItems" [popup]="true" appendTo="body"/>
+                          <p-tieredMenu #moreActionsMenu [model]="tieredMenuItems" [popup]="true" appendTo="body"/>
                         </div>
                       </div>
                     }
@@ -375,7 +389,7 @@
                     </div>
                   </div>
 
-                  @if (userData?.permissions?.admin || userData?.permissions?.canDeleteBook) {
+                  @if (userData?.role === 'ADMIN') {
                     <p-divider layout="vertical"></p-divider>
                     <p-button
                       outlined="true"

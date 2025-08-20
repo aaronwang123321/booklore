@@ -4,8 +4,10 @@ import {Observable} from 'rxjs';
 import {API_CONFIG} from '../../config/api-config';
 
 export interface SetupPayload {
+  username: string;
   email: string;
   password: string;
+  displayName?: string;
 }
 
 @Injectable({providedIn: 'root'})
@@ -16,6 +18,6 @@ export class SetupService {
   private http = inject(HttpClient);
 
   createAdmin(payload: SetupPayload): Observable<void> {
-    return this.http.post<void>(this.url, payload);
+    return this.http.post<void>(`${this.url}/first-user`, payload);
   }
 }

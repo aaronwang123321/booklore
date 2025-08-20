@@ -3,7 +3,7 @@ import {AppMenuitemComponent} from './app.menuitem.component';
 import {AsyncPipe} from '@angular/common';
 import {MenuModule} from 'primeng/menu';
 import {LibraryService} from '../../../book/service/library.service';
-import {Observable, of} from 'rxjs';
+import {combineLatest, Observable, of} from 'rxjs';
 import {filter, map} from 'rxjs/operators';
 import {ShelfService} from '../../../book/service/shelf.service';
 import {BookService} from '../../../book/service/book.service';
@@ -12,7 +12,19 @@ import {AppVersion, VersionService} from '../../../core/service/version.service'
 import {DialogService, DynamicDialogRef} from 'primeng/dynamicdialog';
 import {VersionChangelogDialogComponent} from './version-changelog-dialog/version-changelog-dialog.component';
 import {UserService} from '../../../settings/user-management/user.service';
-import {MagicShelf, MagicShelfService, MagicShelfState} from '../../../magic-shelf-service';
+import {MagicShelfService, MagicShelfState} from '../../../magic-shelf-service';
+
+interface MenuItem {
+  label: string;
+  icon?: string;
+  routerLink?: string[];
+  type?: string;
+  items?: MenuItem[];
+  bookCount$?: Observable<number>;
+  menu?: object[];
+  hasDropDown?: boolean;
+  hasCreate?: boolean;
+}
 
 @Component({
   selector: 'app-menu',
@@ -21,10 +33,10 @@ import {MagicShelf, MagicShelfService, MagicShelfState} from '../../../magic-she
   templateUrl: './app.menu.component.html',
 })
 export class AppMenuComponent implements OnInit {
-  libraryMenu$: Observable<any> | undefined;
-  shelfMenu$: Observable<any> | undefined;
-  homeMenu$: Observable<any> | undefined;
-  magicShelfMenu$: Observable<any> | undefined;
+  libraryMenu$: Observable<MenuItem[]> | undefined;
+  shelfMenu$: Observable<MenuItem[]> | undefined;
+  magicShelfMenu$: Observable<MenuItem[]> | undefined;
+  homeMenu$: Observable<MenuItem[]> | undefined;
 
   versionInfo: AppVersion | null = null;
   dynamicDialogRef: DynamicDialogRef | undefined;
@@ -63,33 +75,75 @@ export class AppMenuComponent implements OnInit {
         this.initMenus();
       });
 
-    this.homeMenu$ = this.bookService.bookState$.pipe(
-      map((bookState) => [
-        {
+    this.homeMenu$ = combineLatest([
+      this.bookService.bookState$,
+      this.userService.userState$
+    ]).pipe(
+      map(([bookState, userState]) => {
+        const menuItems = [
+          {
+            label: 'Dashboard',
+            icon: 'pi pi-fw pi-home',
+            routerLink: ['/dashboard'],
+          },
+          {
+            label: 'All Books',
+            type: 'All Books',
+            icon: 'pi pi-fw pi-book',
+            routerLink: ['/all-books'],
+            bookCount$: of(bookState.books ? bookState.books.length : 0),
+          }
+        ];
+
+        // Add admin menu items for admin users
+        if (userState?.role === 'ADMIN') {
+          menuItems.push({
+            label: 'Admin Dashboard',
+            icon: 'pi pi-fw pi-shield',
+            routerLink: ['/admin'],
+          });
+          menuItems.push({
+            label: 'Payment Analytics',
+            icon: 'pi pi-fw pi-chart-bar',
+            routerLink: ['/admin/payment-analytics'],
+          });
+        }
+
+        // Add subscription and payment menu items for all users
+        menuItems.push({
+          label: 'Subscription',
+          icon: 'pi pi-fw pi-credit-card',
+          routerLink: ['/subscription'],
+        });
+        menuItems.push({
+          label: 'Payment History',
+          icon: 'pi pi-fw pi-history',
+          routerLink: ['/subscription/history'],
+        });
+        menuItems.push({
+          label: 'Payment Methods',
+          icon: 'pi pi-fw pi-wallet',
+          routerLink: ['/payment/methods'],
+        });
+
+        menuItems.push({
+          label: 'Settings',
+          icon: 'pi pi-fw pi-cog',
+          routerLink: ['/settings'],
+        });
+
+        return [{
           label: 'Home',
-          items: [
-            {
-              label: 'Dashboard',
-              icon: 'pi pi-fw pi-home',
-              routerLink: ['/dashboard'],
-            },
-            {
-              label: 'All Books',
-              type: 'All Books',
-              icon: 'pi pi-fw pi-book',
-              routerLink: ['/all-books'],
-              bookCount$: of(bookState.books ? bookState.books.length : 0),
-            },
-          ],
-        },
-      ])
+          items: menuItems,
+        }];
+      })
     );
   }
 
   private initMenus(): void {
     this.libraryMenu$ = this.libraryService.libraryState$.pipe(
       map((state) => {
-        const libraries = state.libraries ?? [];
+        const libraries = Array.isArray(state?.libraries) ? state.libraries : [];
         const sortedLibraries = this.sortArray(libraries, this.librarySortField, this.librarySortOrder);
         return [
           {
@@ -112,7 +166,7 @@ export class AppMenuComponent implements OnInit {
 
     this.magicShelfMenu$ = this.magicShelfService.shelvesState$.pipe(
       map((state: MagicShelfState) => {
-        const shelves = state.shelves ?? [];
+        const shelves = Array.isArray(state?.shelves) ? state.shelves : [];
         const sortedShelves = this.sortArray(shelves, 'name', 'asc');
         return [
           {
@@ -135,7 +189,7 @@ export class AppMenuComponent implements OnInit {
 
     this.shelfMenu$ = this.shelfService.shelfState$.pipe(
       map((state) => {
-        const shelves = state.shelves ?? [];
+        const shelves = Array.isArray(state?.shelves) ? state.shelves : [];
         const sortedShelves = this.sortArray(shelves, this.shelfSortField, this.shelfSortOrder);
 
         const shelfItems = sortedShelves.map((shelf) => ({
@@ -193,13 +247,16 @@ export class AppMenuComponent implements OnInit {
   }
 
   private sortArray<T>(array: T[], field: 'name' | 'id', order: 'asc' | 'desc'): T[] {
+    if (!Array.isArray(array)) {
+      return [];
+    }
     return [...array].sort((a, b) => {
-      const aVal = (a as any)[field] ?? '';
-      const bVal = (b as any)[field] ?? '';
+      const aVal = (a as never)[field] ?? '';
+      const bVal = (b as never)[field] ?? '';
       let comparison = 0;
 
       if (typeof aVal === 'string' && typeof bVal === 'string') {
-        comparison = aVal.localeCompare(bVal);
+        comparison = (aVal as string).localeCompare(bVal as string);
       } else if (typeof aVal === 'number' && typeof bVal === 'number') {
         comparison = aVal - bVal;
       }

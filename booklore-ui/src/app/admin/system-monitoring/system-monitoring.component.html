@@ -1,0 +1,283 @@
+<div class="system-monitoring">
+  <!-- 页面标题和控制按钮 -->
+  <div class="monitoring-header">
+    <h1>系统监控</h1>
+    <div class="header-actions">
+      <p-button 
+        [label]="isRealTimeEnabled ? '停止实时监控' : '开启实时监控'"
+        [icon]="isRealTimeEnabled ? 'pi pi-pause' : 'pi pi-play'"
+        [severity]="isRealTimeEnabled ? 'danger' : 'success'"
+        (click)="toggleRealTimeMonitoring()">
+      </p-button>
+      <p-button 
+        label="刷新数据" 
+        icon="pi pi-refresh" 
+        severity="secondary"
+        (click)="refreshData()">
+      </p-button>
+    </div>
+  </div>
+
+  <!-- 选项卡容器 -->
+  <p-tabView>
+    <!-- 系统指标选项卡 -->
+    <p-tabPanel header="系统指标" leftIcon="pi pi-chart-line">
+      <div class="system-metrics" *ngIf="systemMetrics$ | async as metrics">
+        <!-- 系统概览卡片 -->
+        <div class="metrics-overview">
+          <p-card class="metric-card">
+            <div class="metric-content">
+              <div class="metric-icon cpu">
+                <i class="pi pi-microchip"></i>
+              </div>
+              <div class="metric-info">
+                <h3>{{ metrics.cpu.usage }}%</h3>
+                <p>CPU使用率</p>
+                <small>{{ metrics.cpu.cores }} 核心</small>
+              </div>
+            </div>
+            <p-progressBar [value]="metrics.cpu.usage" [showValue]="false"></p-progressBar>
+          </p-card>
+
+          <p-card class="metric-card">
+            <div class="metric-content">
+              <div class="metric-icon memory">
+                <i class="pi pi-database"></i>
+              </div>
+              <div class="metric-info">
+                <h3>{{ metrics.memory.usage }}%</h3>
+                <p>内存使用率</p>
+                <small>{{ formatBytes(metrics.memory.used) }} / {{ formatBytes(metrics.memory.total) }}</small>
+              </div>
+            </div>
+            <p-progressBar [value]="metrics.memory.usage" [showValue]="false"></p-progressBar>
+          </p-card>
+
+          <p-card class="metric-card">
+            <div class="metric-content">
+              <div class="metric-icon disk">
+                <i class="pi pi-folder"></i>
+              </div>
+              <div class="metric-info">
+                <h3>{{ metrics.disk.usage }}%</h3>
+                <p>磁盘使用率</p>
+                <small>{{ formatBytes(metrics.disk.used) }} / {{ formatBytes(metrics.disk.total) }}</small>
+              </div>
+            </div>
+            <p-progressBar [value]="metrics.disk.usage" [showValue]="false"></p-progressBar>
+          </p-card>
+
+          <p-card class="metric-card">
+            <div class="metric-content">
+              <div class="metric-icon network">
+                <i class="pi pi-wifi"></i>
+              </div>
+              <div class="metric-info">
+                <h3>网络流量</h3>
+                <p>入站: {{ formatBytes(metrics.network.bytesIn) }}</p>
+                <small>出站: {{ formatBytes(metrics.network.bytesOut) }}</small>
+              </div>
+            </div>
+          </p-card>
+        </div>
+
+        <!-- 图表区域 -->
+        <div class="charts-grid">
+          <p-card class="chart-card">
+            <ng-template pTemplate="header">
+              <h3>CPU使用率分布</h3>
+            </ng-template>
+            <div class="chart-container">
+              <p-chart 
+                type="doughnut" 
+                [data]="cpuChartData" 
+                [options]="cpuChartOptions">
+              </p-chart>
+            </div>
+          </p-card>
+
+          <p-card class="chart-card">
+            <ng-template pTemplate="header">
+              <h3>内存使用情况</h3>
+            </ng-template>
+            <div class="chart-container">
+              <p-chart 
+                type="doughnut" 
+                [data]="memoryChartData" 
+                [options]="memoryChartOptions">
+              </p-chart>
+            </div>
+          </p-card>
+
+          <p-card class="chart-card">
+            <ng-template pTemplate="header">
+              <h3>网络流量统计</h3>
+            </ng-template>
+            <div class="chart-container">
+              <p-chart 
+                type="bar" 
+                [data]="networkChartData" 
+                [options]="networkChartOptions">
+              </p-chart>
+            </div>
+          </p-card>
+        </div>
+      </div>
+    </p-tabPanel>
+
+    <!-- 数据库状态选项卡 -->
+    <p-tabPanel header="数据库状态" leftIcon="pi pi-database">
+      <div class="database-status" *ngIf="databaseStatus$ | async as dbStatus">
+        <div class="status-overview">
+          <p-card>
+            <div class="db-status-header">
+              <h2>数据库连接状态</h2>
+              <p-tag 
+                [value]="dbStatus.status" 
+                [severity]="dbStatus.status === 'connected' ? 'success' : 'danger'">
+              </p-tag>
+            </div>
+            
+            <div class="db-metrics">
+              <div class="db-metric">
+                <span class="metric-label">活跃连接数:</span>
+                <span class="metric-value">{{ dbStatus.connectionCount }}</span>
+              </div>
+              <div class="db-metric">
+                <span class="metric-label">查询总数:</span>
+                <span class="metric-value">{{ dbStatus.queryCount }}</span>
+              </div>
+              <div class="db-metric">
+                <span class="metric-label">平均响应时间:</span>
+                <span class="metric-value">{{ dbStatus.avgResponseTime }}ms</span>
+              </div>
+              <div class="db-metric">
+                <span class="metric-label">数据库大小:</span>
+                <span class="metric-value">{{ formatBytes(dbStatus.size) }}</span>
+              </div>
+              <div class="db-metric" *ngIf="dbStatus.lastBackup">
+                <span class="metric-label">最后备份:</span>
+                <span class="metric-value">{{ dbStatus.lastBackup | date:'medium' }}</span>
+              </div>
+            </div>
+          </p-card>
+        </div>
+      </div>
+    </p-tabPanel>
+
+    <!-- 服务状态选项卡 -->
+    <p-tabPanel header="服务状态" leftIcon="pi pi-cog">
+      <div class="services-status" *ngIf="serviceStatuses$ | async as services">
+        <p-card>
+          <ng-template pTemplate="header">
+            <h2>系统服务状态</h2>
+          </ng-template>
+          
+          <p-table [value]="services" [paginator]="true" [rows]="10">
+            <ng-template pTemplate="header">
+              <tr>
+                <th>服务名称</th>
+                <th>状态</th>
+                <th>运行时间</th>
+                <th>内存使用</th>
+                <th>CPU使用</th>
+                <th>端口</th>
+                <th>操作</th>
+              </tr>
+            </ng-template>
+            <ng-template pTemplate="body" let-service>
+              <tr>
+                <td>{{ service.name }}</td>
+                <td>
+                  <p-tag 
+                    [value]="service.status" 
+                    [severity]="getServiceStatusSeverity(service.status)">
+                  </p-tag>
+                </td>
+                <td>{{ formatUptime(service.uptime) }}</td>
+                <td>{{ formatBytes(service.memoryUsage) }}</td>
+                <td>{{ service.cpuUsage }}%</td>
+                <td>{{ service.port || '-' }}</td>
+                <td>
+                  <p-button 
+                    icon="pi pi-refresh" 
+                    severity="secondary" 
+                    size="small"
+                    (click)="restartService(service.name)"
+                    pTooltip="重启服务">
+                  </p-button>
+                </td>
+              </tr>
+            </ng-template>
+          </p-table>
+        </p-card>
+      </div>
+    </p-tabPanel>
+
+    <!-- 系统日志选项卡 -->
+    <p-tabPanel header="系统日志" leftIcon="pi pi-file">
+      <div class="system-logs" *ngIf="systemLogs$ | async as logs">
+        <p-card>
+          <ng-template pTemplate="header">
+            <div class="logs-header">
+              <h2>系统日志</h2>
+              <div class="logs-actions">
+                <p-button 
+                  label="导出日志" 
+                  icon="pi pi-download" 
+                  severity="secondary"
+                  (click)="exportLogs()">
+                </p-button>
+                <p-button 
+                  label="清空日志" 
+                  icon="pi pi-trash" 
+                  severity="danger"
+                  (click)="clearLogs()">
+                </p-button>
+              </div>
+            </div>
+          </ng-template>
+          
+          <p-table [value]="logs" [paginator]="true" [rows]="20" [sortField]="'timestamp'" [sortOrder]="-1">
+            <ng-template pTemplate="header">
+              <tr>
+                <th pSortableColumn="timestamp">时间 <p-sortIcon field="timestamp"></p-sortIcon></th>
+                <th pSortableColumn="level">级别 <p-sortIcon field="level"></p-sortIcon></th>
+                <th pSortableColumn="service">服务 <p-sortIcon field="service"></p-sortIcon></th>
+                <th>消息</th>
+                <th>详情</th>
+              </tr>
+            </ng-template>
+            <ng-template pTemplate="body" let-log>
+              <tr>
+                <td>{{ log.timestamp | date:'short' }}</td>
+                <td>
+                  <p-tag 
+                    [value]="log.level" 
+                    [severity]="getLogLevelSeverity(log.level)">
+                  </p-tag>
+                </td>
+                <td>{{ log.service }}</td>
+                <td class="log-message">{{ log.message }}</td>
+                <td>
+                  <p-button 
+                    *ngIf="log.details"
+                    icon="pi pi-eye" 
+                    severity="secondary" 
+                    size="small"
+                    pTooltip="查看详情">
+                  </p-button>
+                </td>
+              </tr>
+            </ng-template>
+            <ng-template pTemplate="emptymessage">
+              <tr>
+                <td colspan="5" class="text-center">暂无日志记录</td>
+              </tr>
+            </ng-template>
+          </p-table>
+        </p-card>
+      </div>
+    </p-tabPanel>
+  </p-tabView>
+</div>

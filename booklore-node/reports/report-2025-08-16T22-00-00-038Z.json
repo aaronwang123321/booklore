@@ -1,0 +1,332 @@
+{
+  "metadata": {
+    "title": "Daily Analytics Report",
+    "generatedAt": "2025-08-16T22:00:00.038Z",
+    "period": {
+      "start": "2025-08-15T22:00:00.016Z",
+      "end": "2025-08-16T22:00:00.016Z"
+    },
+    "type": "daily",
+    "format": "json"
+  },
+  "summary": {
+    "totalSections": 4,
+    "generatedAt": "2025-08-16T22:00:00.038Z",
+    "revenue": {
+      "total": 0,
+      "growth": 0
+    },
+    "users": {
+      "total": 0,
+      "active": 0,
+      "new": 0
+    },
+    "system": {
+      "cpuUsage": 4.429799999999999,
+      "memoryUsage": 99.38313166300455,
+      "diskUsage": 50
+    }
+  },
+  "sections": {
+    "revenue": {
+      "totalRevenue": 0,
+      "monthlyRevenue": 0,
+      "dailyRevenue": 0,
+      "yearlyRevenue": 0,
+      "averageOrderValue": 0,
+      "revenueGrowth": {
+        "monthly": 0,
+        "daily": 0,
+        "yearly": 0
+      },
+      "topPlans": []
+    },
+    "users": {
+      "dailyActiveUsers": [
+        {
+          "date": "2025-07-18",
+          "count": 0
+        },
+        {
+          "date": "2025-07-19",
+          "count": 0
+        },
+        {
+          "date": "2025-07-20",
+          "count": 0
+        },
+        {
+          "date": "2025-07-21",
+          "count": 0
+        },
+        {
+          "date": "2025-07-22",
+          "count": 0
+        },
+        {
+          "date": "2025-07-23",
+          "count": 0
+        },
+        {
+          "date": "2025-07-24",
+          "count": 0
+        },
+        {
+          "date": "2025-07-25",
+          "count": 0
+        },
+        {
+          "date": "2025-07-26",
+          "count": 0
+        },
+        {
+          "date": "2025-07-27",
+          "count": 0
+        },
+        {
+          "date": "2025-07-28",
+          "count": 0
+        },
+        {
+          "date": "2025-07-29",
+          "count": 0
+        },
+        {
+          "date": "2025-07-30",
+          "count": 0
+        },
+        {
+          "date": "2025-07-31",
+          "count": 0
+        },
+        {
+          "date": "2025-08-01",
+          "count": 0
+        },
+        {
+          "date": "2025-08-02",
+          "count": 0
+        },
+        {
+          "date": "2025-08-03",
+          "count": 0
+        },
+        {
+          "date": "2025-08-04",
+          "count": 0
+        },
+        {
+          "date": "2025-08-05",
+          "count": 0
+        },
+        {
+          "date": "2025-08-06",
+          "count": 0
+        },
+        {
+          "date": "2025-08-07",
+          "count": 0
+        },
+        {
+          "date": "2025-08-08",
+          "count": 0
+        },
+        {
+          "date": "2025-08-09",
+          "count": 0
+        },
+        {
+          "date": "2025-08-10",
+          "count": 0
+        },
+        {
+          "date": "2025-08-11",
+          "count": 0
+        },
+        {
+          "date": "2025-08-12",
+          "count": 0
+        },
+        {
+          "date": "2025-08-13",
+          "count": 0
+        },
+        {
+          "date": "2025-08-14",
+          "count": 0
+        },
+        {
+          "date": "2025-08-15",
+          "count": 0
+        },
+        {
+          "date": "2025-08-16",
+          "count": 0
+        }
+      ],
+      "weeklyActiveUsers": [
+        {
+          "week": "2025-W21",
+          "count": 0
+        },
+        {
+          "week": "2025-W22",
+          "count": 0
+        },
+        {
+          "week": "2025-W23",
+          "count": 0
+        },
+        {
+          "week": "2025-W24",
+          "count": 0
+        },
+        {
+          "week": "2025-W25",
+          "count": 0
+        },
+        {
+          "week": "2025-W26",
+          "count": 0
+        },
+        {
+          "week": "2025-W27",
+          "count": 0
+        },
+        {
+          "week": "2025-W28",
+          "count": 0
+        },
+        {
+          "week": "2025-W29",
+          "count": 0
+        },
+        {
+          "week": "2025-W30",
+          "count": 0
+        },
+        {
+          "week": "2025-W31",
+          "count": 0
+        },
+        {
+          "week": "2025-W32",
+          "count": 0
+        }
+      ],
+      "monthlyActiveUsers": [
+        {
+          "month": "2024-08",
+          "count": 0
+        },
+        {
+          "month": "2024-09",
+          "count": 0
+        },
+        {
+          "month": "2024-10",
+          "count": 0
+        },
+        {
+          "month": "2024-11",
+          "count": 0
+        },
+        {
+          "month": "2024-12",
+          "count": 0
+        },
+        {
+          "month": "2025-01",
+          "count": 0
+        },
+        {
+          "month": "2025-02",
+          "count": 0
+        },
+        {
+          "month": "2025-03",
+          "count": 0
+        },
+        {
+          "month": "2025-04",
+          "count": 0
+        },
+        {
+          "month": "2025-05",
+          "count": 0
+        },
+        {
+          "month": "2025-06",
+          "count": 0
+        },
+        {
+          "month": "2025-07",
+          "count": 0
+        }
+      ],
+      "userEngagement": {
+        "averageSessionDuration": 0,
+        "averageBooksPerUser": 0,
+        "averageReadingTime": 0,
+        "mostActiveHours": []
+      },
+      "userRetention": {
+        "day1": 0,
+        "day7": 0,
+        "day30": 0
+      }
+    },
+    "system": {
+      "timestamp": "2025-08-16T22:00:00.014Z",
+      "cpu": {
+        "usage": 4.429799999999999,
+        "loadAverage": [
+          3.03369140625,
+          3.79931640625,
+          4.1259765625
+        ],
+        "cores": 12
+      },
+      "memory": {
+        "total": 51539607552,
+        "used": 51221676032,
+        "free": 317931520,
+        "usage": 99.38313166300455
+      },
+      "disk": {
+        "total": 107374182400,
+        "used": 53687091200,
+        "free": 53687091200,
+        "usage": 50
+      },
+      "network": {
+        "bytesIn": 0,
+        "bytesOut": 0,
+        "packetsIn": 0,
+        "packetsOut": 0
+      },
+      "process": {
+        "pid": 91299,
+        "uptime": 14885.403262416,
+        "memoryUsage": {
+          "rss": 175423488,
+          "heapTotal": 70615040,
+          "heapUsed": 65384672,
+          "external": 4604747,
+          "arrayBuffers": 1185856
+        },
+        "cpuUsage": {
+          "user": 6376656,
+          "system": 1908946
+        }
+      }
+    },
+    "performance": {
+      "status": "critical",
+      "score": 60,
+      "issues": [
+        "Memory usage is critically high: 99.6%"
+      ]
+    }
+  }
+}
