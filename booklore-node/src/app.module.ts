@@ -24,6 +24,10 @@ import { UserModule } from './user/user.module';
 import { AnalyticsModule } from './analytics/analytics.module';
 import { PathModule } from './path/path.module';
 import { I18nConfigModule } from './i18n/i18n.module';
+import { AuthorModule } from './author/author.module';
+import { MagicShelfModule } from './magic-shelf/magic-shelf.module';
+import { PdfReaderModule } from './pdf-reader/pdf-reader.module';
+import { ShelfModule } from './shelf/shelf.module';
 import { HealthController } from './health.controller';
 import { PerformanceMiddleware } from './shared/middleware/performance.middleware';
 import { SecurityMiddleware } from './shared/middleware/security.middleware';
@@ -94,6 +98,10 @@ import { SecurityScannerService } from './shared/services/security-scanner.servi
     AnalyticsModule,
     PathModule,
     I18nConfigModule,
+    AuthorModule,
+    MagicShelfModule,
+    PdfReaderModule,
+    ShelfModule,
   ],
   controllers: [HealthController],
   providers: [

@@ -386,7 +386,7 @@ export class SecurityLoggerService {
   }
 
   // Query methods
-  async getEventCount(filters: {
+  async getEventCount(_filters: {
     eventType?: SecurityEventType;
     severity?: SecurityEventSeverity;
     userId?: string;
@@ -399,7 +399,7 @@ export class SecurityLoggerService {
     return 0;
   }
 
-  async getEvents(filters: {
+  async getEvents(_filters: {
     eventType?: SecurityEventType;
     severity?: SecurityEventSeverity;
     userId?: string;
@@ -414,7 +414,7 @@ export class SecurityLoggerService {
     return [];
   }
 
-  async getSecurityMetrics(timeRange: { since: Date; until: Date }): Promise<SecurityMetrics> {
+  async getSecurityMetrics(_timeRange: { since: Date; until: Date }): Promise<SecurityMetrics> {
     // This would aggregate data from database or log files
     // For now, return mock metrics
     return {

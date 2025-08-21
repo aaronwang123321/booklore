@@ -1,3 +1,4 @@
+import '@angular/localize/init';
 import {provideHttpClient, withInterceptors} from '@angular/common/http';
 import {DialogService} from 'primeng/dynamicdialog';
 import {ConfirmationService, MessageService} from 'primeng/api';

@@ -4,7 +4,7 @@ import { Cron, CronExpression } from '@nestjs/schedule';
 import { PrismaService } from '../database/prisma.service';
 import * as fs from 'fs/promises';
 import * as path from 'path';
-import * as crypto from 'crypto';
+// import * as crypto from 'crypto';
 
 interface SecurityScanResult {
   timestamp: Date;
@@ -29,12 +29,12 @@ interface SecurityFinding {
   details?: any;
 }
 
-interface FileIntegrityCheck {
-  filePath: string;
-  expectedHash: string;
-  currentHash?: string;
-  status: 'ok' | 'modified' | 'missing';
-}
+// interface FileIntegrityCheck {
+//   filePath: string;
+//   expectedHash: string;
+//   currentHash?: string;
+//   status: 'ok' | 'modified' | 'missing';
+// }
 
 @Injectable()
 export class SecurityScannerService {
@@ -193,7 +193,7 @@ export class SecurityScannerService {
       // Check for old sessions (if session table exists)
       try {
         const oldSessions = await this.prismaService.$queryRaw`
-          SELECT COUNT(*) as count FROM "Session" 
+          SELECT COUNT(*) as count FROM "Session"
           WHERE "expiresAt" < NOW() - INTERVAL '7 days'
         `;
 
@@ -263,7 +263,7 @@ export class SecurityScannerService {
       }
 
       // Check for backup files that might contain sensitive data
-      const backupPatterns = ['*.bak', '*.backup', '*.old', '*.tmp'];
+      // const backupPatterns = ['*.bak', '*.backup', '*.old', '*.tmp'];
       // This is a simplified check - in production, you'd want to use a proper file search
     } catch (error) {
       findings.push({
@@ -425,9 +425,8 @@ export class SecurityScannerService {
 
     for (const filePath of this.criticalFiles) {
       try {
-        const content = await fs.readFile(filePath, 'utf-8');
-        const currentHash = crypto.createHash('sha256').update(content).digest('hex');
-
+        // const content = await fs.readFile(filePath, 'utf-8');
+        // const currentHash = crypto.createHash('sha256').update(content).digest('hex');
         // In a real implementation, you'd store and compare against known good hashes
         // For now, just check if the file exists and is readable
       } catch (error) {

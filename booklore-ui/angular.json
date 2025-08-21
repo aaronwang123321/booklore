@@ -20,6 +20,31 @@
       "root": "",
       "sourceRoot": "src",
       "prefix": "app",
+      "i18n": {
+        "sourceLocale": "en-US",
+        "locales": {
+          "zh-CN": {
+            "translation": "src/locale/messages.zh-CN.xlf",
+            "baseHref": "/zh/"
+          },
+          "ja-JP": {
+            "translation": "src/locale/messages.ja-JP.xlf",
+            "baseHref": "/ja/"
+          },
+          "fr-FR": {
+            "translation": "src/locale/messages.fr-FR.xlf",
+            "baseHref": "/fr/"
+          },
+          "de-DE": {
+            "translation": "src/locale/messages.de-DE.xlf",
+            "baseHref": "/de/"
+          },
+          "es-ES": {
+            "translation": "src/locale/messages.es-ES.xlf",
+            "baseHref": "/es/"
+          }
+        }
+      },
       "architect": {
         "build": {
           "builder": "@angular-devkit/build-angular:application",

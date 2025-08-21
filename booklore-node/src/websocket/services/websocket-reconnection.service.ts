@@ -166,7 +166,7 @@ export class WebSocketReconnectionService implements OnModuleInit, OnModuleDestr
         }, this.config.connectionTimeout);
 
         // 监听pong响应
-        socket.once('pong', data => {
+        socket.once('pong', _data => {
           clearTimeout(timeoutTimer);
           const latency = Date.now() - startTime;
           this.updateConnectionMetrics(socket.id, latency);
@@ -311,7 +311,7 @@ export class WebSocketReconnectionService implements OnModuleInit, OnModuleDestr
         timestamp: new Date(),
         success: false, // 暂时标记为失败，成功时会更新
       });
-    } catch (error) {
+    } catch (error: any) {
       this.logger.error(`Reconnection attempt failed for ${state.socketId}:`, error);
 
       // 记录失败的重连尝试

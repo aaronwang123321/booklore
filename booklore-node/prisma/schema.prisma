@@ -37,6 +37,7 @@ model User {
   notifications     Notification[]
   notificationPreference NotificationPreference?
   paymentRetryAttempts PaymentRetryAttempt[]
+  magicShelves      MagicShelf[]
   
   @@map("users")
 }
@@ -56,6 +57,7 @@ model Library {
   members     LibraryMember[]
   shelves     Shelf[]
   books       Book[]
+  magicShelves MagicShelf[]
   
   @@map("libraries")
 }
@@ -90,6 +92,59 @@ model Shelf {
   books       Book[]
   
   @@map("shelves")
+}
+
+model Author {
+  id        Int      @id @default(autoincrement())
+  name      String
+  biography String?
+  birthDate DateTime?
+  deathDate DateTime?
+  nationality String?
+  website   String?
+  imageUrl  String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  // 关系
+  books     BookAuthor[]
+  
+  @@map("authors")
+}
+
+model BookAuthor {
+  id       Int    @id @default(autoincrement())
+  bookId   Int
+  authorId Int
+  role     String @default("author") // author, editor, translator, etc.
+  
+  // 关系
+  book     Book   @relation(fields: [bookId], references: [id], onDelete: Cascade)
+  author   Author @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  
+  @@unique([bookId, authorId, role])
+  @@map("book_authors")
+}
+
+model MagicShelf {
+  id          Int      @id @default(autoincrement())
+  name        String
+  description String?
+  query       Json     // 智能书架的查询条件
+  color       String?
+  icon        String?
+  isActive    Boolean  @default(true)
+  order       Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  // 关系
+  userId      Int
+  libraryId   Int
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  library     Library  @relation(fields: [libraryId], references: [id], onDelete: Cascade)
+  
+  @@map("magic_shelves")
 }
 
 model Book {
@@ -127,6 +182,7 @@ model Book {
   userProgress  UserBookProgress[]
   metadataJobs  MetadataFetchJob[]
   metadataHistory MetadataHistory[]
+  authors       BookAuthor[]
   
   @@map("books")
 }

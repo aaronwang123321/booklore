@@ -1,5 +1,6 @@
-import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit, OnChanges, Input, Output, EventEmitter } from '@angular/core';
 import { PaymentService } from '../../../services/payment.service';
+import { MessageService } from 'primeng/api';
 
 export interface PaymentIntent {
   id: string;
@@ -44,7 +45,7 @@ export interface PaymentMethod {
   templateUrl: './payment-retry.component.html',
   styleUrls: ['./payment-retry.component.css']
 })
-export class PaymentRetryComponent implements OnInit {
+export class PaymentRetryComponent implements OnInit, OnChanges {
   @Input() paymentIntentId!: string;
   @Input() showModal: boolean = false;
   @Output() modalClosed = new EventEmitter<void>();
@@ -64,7 +65,8 @@ export class PaymentRetryComponent implements OnInit {
   isLoadingPaymentMethods: boolean = false;
 
   constructor(
-    private paymentService: PaymentService
+    private paymentService: PaymentService,
+    private messageService: MessageService
   ) {}
 
   ngOnInit(): void {
@@ -124,7 +126,7 @@ export class PaymentRetryComponent implements OnInit {
 
   async retryPayment(): Promise<void> {
     if (!this.paymentIntent || !this.selectedPaymentMethodId) {
-      this.notificationService.showError('请选择支付方式');
+      this.messageService.add({ severity: 'error', summary: '错误', detail: '请选择支付方式' });
       return;
     }
 
@@ -138,9 +140,10 @@ export class PaymentRetryComponent implements OnInit {
     this.retryAttempts++;
 
     try {
-      const response = await this.paymentService.retryPayment(
-        this.paymentIntent.id
-      ).toPromise();
+      const response = await this.paymentService.retryPayment({
+        paymentIntentId: this.paymentIntent.id,
+        paymentMethodId: this.selectedPaymentMethodId
+      }).toPromise();
 
       if (response?.data) {
         const updatedPaymentIntent = response.data as PaymentIntent;
@@ -152,7 +155,7 @@ export class PaymentRetryComponent implements OnInit {
            this.closeModal();
          } else if (updatedPaymentIntent.status === 'requires_action') {
            // 需要额外验证（如3D Secure）
-           this.handleRequiresAction(updatedPaymentIntent);
+           this.handleRequiresAction();
          } else {
            throw new Error(updatedPaymentIntent.lastPaymentError?.message || '支付失败');
          }
@@ -184,7 +187,8 @@ export class PaymentRetryComponent implements OnInit {
 
     try {
       const response = await this.paymentService.confirmPaymentIntent(
-        this.paymentIntent.id
+        this.paymentIntent.id,
+        this.selectedPaymentMethodId || ''
       ).toPromise();
 
       if (response?.data) {

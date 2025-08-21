@@ -470,7 +470,7 @@ export class SecurityConfigService {
     return size <= this.config.fileUpload.maxFileSize;
   }
 
-  shouldLogSecurityEvent(eventType: string): boolean {
+  shouldLogSecurityEvent(_eventType: string): boolean {
     return this.config.monitoring.logSecurityEvents;
   }
 

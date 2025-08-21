@@ -24,7 +24,7 @@ export interface MagicShelfState {
   providedIn: 'root',
 })
 export class MagicShelfService {
-  private readonly url = `${API_CONFIG.BASE_URL}/api/magic-shelves`;
+  private readonly url = `${API_CONFIG.BASE_URL}/api/v1/magic-shelves`;
 
   private readonly http = inject(HttpClient);
   private readonly bookService = inject(BookService);
@@ -55,7 +55,7 @@ export class MagicShelfService {
     );
   }
 
-  saveShelf(data: { id?: number; name: string | null; icon: string | null; group: any }): Observable<MagicShelf> {
+  saveShelf(data: { id?: number; name: string | null; icon: string | null; group: GroupRule }): Observable<MagicShelf> {
     const payload: MagicShelf = {
       id: data.id,
       name: data.name ?? '',

@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2">
+  <file source-language="en-US" target-language="de-DE" datatype="plaintext" original="ng2.template">
+    <body>
+      <!-- Navigation -->
+      <trans-unit id="nav.home" datatype="html">
+        <source>Home</source>
+        <target>Startseite</target>
+      </trans-unit>
+      <trans-unit id="nav.books" datatype="html">
+        <source>Books</source>
+        <target>Bücher</target>
+      </trans-unit>
+      <trans-unit id="nav.profile" datatype="html">
+        <source>Profile</source>
+        <target>Profil</target>
+      </trans-unit>
+      <trans-unit id="nav.logout" datatype="html">
+        <source>Logout</source>
+        <target>Abmelden</target>
+      </trans-unit>
+      
+      <!-- Authentication -->
+      <trans-unit id="auth.login" datatype="html">
+        <source>Login</source>
+        <target>Anmelden</target>
+      </trans-unit>
+      <trans-unit id="auth.register" datatype="html">
+        <source>Register</source>
+        <target>Registrieren</target>
+      </trans-unit>
+      <trans-unit id="auth.email" datatype="html">
+        <source>Email</source>
+        <target>E-Mail</target>
+      </trans-unit>
+      <trans-unit id="auth.password" datatype="html">
+        <source>Password</source>
+        <target>Passwort</target>
+      </trans-unit>
+      <trans-unit id="auth.confirm.password" datatype="html">
+        <source>Confirm Password</source>
+        <target>Passwort bestätigen</target>
+      </trans-unit>
+      
+      <!-- Books -->
+      <trans-unit id="books.title" datatype="html">
+        <source>Title</source>
+        <target>Titel</target>
+      </trans-unit>
+      <trans-unit id="books.author" datatype="html">
+        <source>Author</source>
+        <target>Autor</target>
+      </trans-unit>
+      <trans-unit id="books.description" datatype="html">
+        <source>Description</source>
+        <target>Beschreibung</target>
+      </trans-unit>
+      <trans-unit id="books.add" datatype="html">
+        <source>Add Book</source>
+        <target>Buch hinzufügen</target>
+      </trans-unit>
+      <trans-unit id="books.edit" datatype="html">
+        <source>Edit Book</source>
+        <target>Buch bearbeiten</target>
+      </trans-unit>
+      <trans-unit id="books.delete" datatype="html">
+        <source>Delete Book</source>
+        <target>Buch löschen</target>
+      </trans-unit>
+      
+      <!-- Common Actions -->
+      <trans-unit id="common.save" datatype="html">
+        <source>Save</source>
+        <target>Speichern</target>
+      </trans-unit>
+      <trans-unit id="common.cancel" datatype="html">
+        <source>Cancel</source>
+        <target>Abbrechen</target>
+      </trans-unit>
+      <trans-unit id="common.delete" datatype="html">
+        <source>Delete</source>
+        <target>Löschen</target>
+      </trans-unit>
+      <trans-unit id="common.edit" datatype="html">
+        <source>Edit</source>
+        <target>Bearbeiten</target>
+      </trans-unit>
+      <trans-unit id="common.search" datatype="html">
+        <source>Search</source>
+        <target>Suchen</target>
+      </trans-unit>
+      
+      <!-- Language Selector -->
+      <trans-unit id="language.selector.placeholder" datatype="html">
+        <source>Select Language</source>
+        <target>Sprache auswählen</target>
+      </trans-unit>
+      
+      <!-- Messages -->
+      <trans-unit id="message.success.save" datatype="html">
+        <source>Successfully saved</source>
+        <target>Erfolgreich gespeichert</target>
+      </trans-unit>
+      <trans-unit id="message.success.delete" datatype="html">
+        <source>Successfully deleted</source>
+        <target>Erfolgreich gelöscht</target>
+      </trans-unit>
+      <trans-unit id="message.error.generic" datatype="html">
+        <source>An error occurred. Please try again.</source>
+        <target>Ein Fehler ist aufgetreten. Bitte versuchen Sie es erneut.</target>
+      </trans-unit>
+      
+      <!-- Validation -->
+      <trans-unit id="validation.required" datatype="html">
+        <source>This field is required</source>
+        <target>Dieses Feld ist erforderlich</target>
+      </trans-unit>
+      <trans-unit id="validation.email.invalid" datatype="html">
+        <source>Please enter a valid email address</source>
+        <target>Bitte geben Sie eine gültige E-Mail-Adresse ein</target>
+      </trans-unit>
+      <trans-unit id="validation.password.min" datatype="html">
+        <source>Password must be at least 8 characters long</source>
+        <target>Das Passwort muss mindestens 8 Zeichen lang sein</target>
+      </trans-unit>
+    </body>
+  </file>
+</xliff>

@@ -40,7 +40,7 @@ export interface MetadataFetchTask {
 })
 export class MetadataTaskService {
 
-  private readonly url = `${API_CONFIG.BASE_URL}/api/metadata/tasks`;
+  private readonly url = `${API_CONFIG.BASE_URL}/api/v1/metadata/tasks`;
   private http = inject(HttpClient);
 
   getTaskWithProposals(taskId: string): Observable<MetadataFetchTask> {
